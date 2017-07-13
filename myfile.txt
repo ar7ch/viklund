@@ -1,0 +1,4 @@
+[viklund-log]
+log_policy = 2
+save_prefs = 1
+

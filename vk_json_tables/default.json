@@ -1,0 +1,28 @@
+{
+	"default": [
+    	{
+    		"call_command":"амдэвс",
+    		"group_id": -92337511,
+      		"posts_count": 40000,
+      		"import_type":"pic"
+    	},
+    	{
+      		"call_command":"бугурт",
+			"group_id": -57536014,
+      		"posts_count": 40000,
+      		"import_type":"msg"
+    	},
+    	{
+      		"call_command":"юморески",
+			"group_id": -92876084,
+      		"posts_count": 30000,
+      		"import_type":"msg"
+    	},
+    	{
+      		"call_command":"тредшот",
+			"group_id": -67171472,
+      		"posts_count": 40000,
+      		"import_type":"pic"
+    	}
+  	]
+}
