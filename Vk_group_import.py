@@ -25,8 +25,10 @@ class Vk_group_import:
 		self.group_id = value
 	def select_and_send_random_group_thing(self, group_id, posts_count, item, type_flag):
 		watchdog_counter = 0
+		posts = viklund.vkApi.wall.get(owner_id = group_id)
+		self.set_posts_count(posts['count'])
 		while True:
-			group_wall = viklund.vkApi.wall.get(count = 1, offset = random.randint(1, posts_count / 2), owner_id = group_id) 
+			group_wall = viklund.vkApi.wall.get(count = 1, offset = random.randint(1, self.get_posts_count()), owner_id = self.get_group_id()) 
 			try:
 				if type_flag == 'pic':
 					pic = u'photo' + str(group_id) + '_' + str(group_wall['items'][0]['attachments'][0]['photo']['id'])
@@ -34,6 +36,9 @@ class Vk_group_import:
 				elif type_flag == 'msg':
 					msg = group_wall['items'][0]['text']
 					viklund.Vk_messages.send_selective(item, 'msg', msg)
+				elif type_flag == 'wall':
+					wall = u'wall' + str(group_id) + '_' + str(group_wall['items'][0]['id'])
+					viklund.Vk_messages.send_selective(item, 'wall', wall)
 				return 1
 			except:
 				if watchdog_counter > 100:
@@ -46,7 +51,7 @@ class Vk_group_import:
 		start_index += 4
 		request_str = ''
 		for i in range(start_index, len(recieved_str)):
-			if recieved_str[i].isalpha():
+			if recieved_str[i].isalpha() or recieved_str[i].isdigit():
 				request_str += recieved_str[i]
 		return request_str
 	def handle_import_request(self, item, recieved_str):
@@ -82,17 +87,14 @@ class Vk_group_import:
 	def search_json(self, json_data, request_str, filename):
 		found = 0
 		group_id = None
-		posts_count = None
 		import_type = None
 		for items in json_data[filename]:
 			#str = 
 			if request_str == items['call_command'] or request_str.find(items['call_command']) != -1:
 				found = 1
 				group_id = items['group_id']
-				posts_count = items['posts_count']
 				import_type = items['import_type']
 				self.group_id = group_id
-				self.posts_count = posts_count
 				self.import_type = import_type
 				break
 		return 1 if found == 1 else 0

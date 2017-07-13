@@ -1,27 +1,25 @@
 {
 	"default": [
     	{
-    		"call_command":"амдэвс",
-    		"group_id": -92337511,
-      		"posts_count": 40000,
+    		"call_command":"природа",
+    		"group_id": -63784266,
+      		"posts_count": 1500,
       		"import_type":"pic"
     	},
     	{
-      		"call_command":"бугурт",
-			"group_id": -57536014,
-      		"posts_count": 40000,
+      		"call_command":"тж",
+		"group_id": -28261334,
+      		"posts_count": 45400,
       		"import_type":"msg"
     	},
     	{
-      		"call_command":"юморески",
-			"group_id": -92876084,
-      		"posts_count": 30000,
-      		"import_type":"msg"
+      		"call_command":"4пда",
+		"group_id": -38624893,
+      		"import_type":"wall"
     	},
     	{
-      		"call_command":"тредшот",
-			"group_id": -67171472,
-      		"posts_count": 40000,
+      		"call_command":"доге",
+		"group_id": -57599453,
       		"import_type":"pic"
     	}
   	]

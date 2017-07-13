@@ -26,6 +26,11 @@ class Vk_messages:
 				viklund.Vk_messages.write_msg_chat(item[u'chat_id'], send_item)
 			else:
 				viklund.Vk_messages.write_msg(item[u'user_id'], send_item)
+		elif send_type == 'wall':
+			if Vk_messages.check_if_chat(item):
+				viklund.Vk_messages.send_wall_post_chat(item[u'chat_id'], send_item)
+			else:
+				viklund.Vk_messages.send_wall_post(item[u'user_id'], send_item)
 	@staticmethod
 	def send_pic(user_id, pic_id):
 		viklund.vk.method('messages.send', {'user_id':user_id, 'attachment':pic_id})
