@@ -54,6 +54,12 @@ class Vk_group_import:
 			if recieved_str[i].isalpha() or recieved_str[i].isdigit():
 				request_str += recieved_str[i]
 		return request_str
+	def get_import_list(self, item, json_data, filename):
+		commands = ''
+		for items in json_data[filename]:
+			commands += items['call_command'] + '\n'
+		viklund.Vk_messages.send_selective(item, 'msg', 'Доступные команды:\n' + commands)
+
 	def handle_import_request(self, item, recieved_str):
 		request = self.get_request_str(recieved_str)
 		if viklund.Vk_messages.check_if_chat(item):
@@ -61,6 +67,9 @@ class Vk_group_import:
 		try:
 			json_data = self.read_json('default')
 			default_search_result = self.search_json(json_data, request, 'default')
+			if request == '':
+				self.get_import_list(item, json_data, 'default');
+				return 0
 			#if not default_search_result:
 			#if not viklund.Vk_messages.check_if_chat(item):
 			if not default_search_result:

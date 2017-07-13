@@ -10,7 +10,7 @@
       		"call_command":"тж",
 		"group_id": -28261334,
       		"posts_count": 45400,
-      		"import_type":"msg"
+      		"import_type":"wall"
     	},
     	{
       		"call_command":"4пда",
@@ -21,6 +21,11 @@
       		"call_command":"доге",
 		"group_id": -57599453,
       		"import_type":"pic"
+    	},
+	{
+      		"call_command":"хабр",
+		"group_id": -20629724,
+      		"import_type":"wall"
     	}
   	]
 }
