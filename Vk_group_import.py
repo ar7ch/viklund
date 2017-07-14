@@ -23,7 +23,7 @@ class Vk_group_import:
 		return self.import_type
 	def set_import_type(self, value):
 		self.group_id = value
-	def select_and_send_random_group_thing(self, group_id, posts_count, item, type_flag):
+	def select_and_send_random_group_thing(self, group_id, item, type_flag):
 		watchdog_counter = 0
 		posts = viklund.vkApi.wall.get(owner_id = group_id)
 		self.set_posts_count(posts['count'])
@@ -58,17 +58,19 @@ class Vk_group_import:
 		commands = ''
 		for items in json_data[filename]:
 			commands += items['call_command'] + '\n'
-		viklund.Vk_messages.send_selective(item, 'msg', 'Доступные команды:\n' + commands)
+		viklund.Vk_messages.send_selective(item, 'msg', 'Использование: \'Лит, пост <команда>\'\nДоступные команды:\n' + commands)
 
-	def handle_import_request(self, item, recieved_str):
-		request = self.get_request_str(recieved_str)
+	@staticmethod
+	def handle_import_request(item, recieved_str):
+		group_import = viklund.Vk_group_import()
+		request = group_import.get_request_str(recieved_str)
 		if viklund.Vk_messages.check_if_chat(item):
 			chat_id = item[u'chat_id']
 		try:
-			json_data = self.read_json('default')
-			default_search_result = self.search_json(json_data, request, 'default')
+			json_data = group_import.read_json('default')
+			default_search_result = group_import.search_json(json_data, request, 'default')
 			if request == '':
-				self.get_import_list(item, json_data, 'default');
+				group_import.get_import_list(item, json_data, 'default');
 				return 0
 			#if not default_search_result:
 			#if not viklund.Vk_messages.check_if_chat(item):
@@ -85,7 +87,7 @@ class Vk_group_import:
 			viklund.Vk_messages.send_selective(item, 'msg', request + ': запрос не найден')
 			return 2
 		else:
-			self.select_and_send_random_group_thing(self.get_group_id(), self.get_posts_count(), item, self.get_import_type()) 
+			group_import.select_and_send_random_group_thing(group_import.get_group_id(), item, group_import.get_import_type()) 
 	
 	def read_json(self, filename):
 		pathname = os.path.abspath(os.path.dirname(sys.argv[0])) #get absolute path current dir (where the script is)

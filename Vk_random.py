@@ -8,6 +8,16 @@ import getpass
 import viklund
 
 class Vk_random:
+	@staticmethod
+	def handle_random(item, recieved_str):
+		rand = viklund.Vk_random()
+		rand.set_toggle_random(True)
+		status_code = rand.find_a_b(recieved_str)
+		if status_code == -1:
+			rand.abort_random(item, 0)
+		elif status_code == 1:
+			rand.set_result(rand.randint_wrapper(rand.get_a(), rand.get_b()))
+			rand.success_random(item)
 	def abort_random(self, item, flag):
 		self.set_toggle_random(False)
 		if flag == 0:
