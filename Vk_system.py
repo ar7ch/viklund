@@ -1,4 +1,3 @@
-import time
 import vk_api
 import random
 import json
@@ -8,6 +7,7 @@ import sys
 import getpass
 import viklund
 import configparser
+from datetime import datetime
 
 class Vk_system():
 	@staticmethod
@@ -90,16 +90,27 @@ class Vk_system():
 			viklund.Vk_system.log_selective(item, None, recieved_str)
 	@staticmethod
 	def log_selective(item, log_file, recieved_str):
-		if viklund.logs_policy == 1:
-			if viklund.Vk_messages.check_if_chat(item):
-				log_file.write('user c id ' + str(item[u'user_id']) + ' в беседе с id ' + str(item[u'chat_id']) + ' написал: ' + recieved_str + '\n')
-			else:
-				log_file.write('user c id ' + str(item[u'user_id']) + ' написал: ' + recieved_str + '\n')
-		elif viklund.logs_policy == 2:
-			if viklund.Vk_messages.check_if_chat(item):
-				print('user c id ' + str(item[u'user_id']) + ' в беседе с id ' + str(item[u'chat_id']) + ' написал: ' + recieved_str)
-			else:
-				print('user c id ' + str(item[u'user_id']) + ' написал: ' + recieved_str)
+		if viklund.logs_policy == 1 or viklund.logs_policy == 2:
+			time = '['
+			try:
+				time += datetime.fromtimestamp(item['date']).strftime('%d/%m/%Y %H:%M:%S')
+			except:
+				time += datetime.now().strftime('%d/%m/%Y %H:%M:%S') #inaccurate time, at least it works
+				time += ' maybe inaccurate'
+			finally:
+				time += '] '
+			user = viklund.vkApi.users.get(user_ids=item[u'user_id'])
+			username = user[0]['first_name'] + ' ' + user[0]['last_name'] + ' '
+			if viklund.logs_policy == 1:
+				if viklund.Vk_messages.check_if_chat(item):
+					log_file.write(time + username + '(' + 'id ' + str(item[u'user_id']) + ') ' + 'в беседе с id ' + str(item[u'chat_id']) + ': ' + recieved_str + '\n')
+				else:
+					log_file.write(time + username + '(' + 'id ' + str(item[u'user_id']) + ') ' + 'в личном сообщении: ' + recieved_str + '\n')
+			elif viklund.logs_policy == 2:
+				if viklund.Vk_messages.check_if_chat(item):
+					print(time + username + '(' + 'id ' + str(item[u'user_id']) + ') ' + 'в беседе с id ' + str(item[u'chat_id']) + ': ' + recieved_str)
+				else:
+					print(time + username + '(' + 'id ' + str(item[u'user_id']) + ') ' + 'в личном сообщении: ' + recieved_str)
 	@staticmethod
 	def vk_auth():
 		try:

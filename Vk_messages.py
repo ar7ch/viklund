@@ -22,6 +22,8 @@ class Vk_messages:
 					viklund.Vk_random.handle_random(item, recieved_str)
 				elif recieved_str.find(u'лит') != -1 and recieved_str.find(u'пост') != -1:
 					viklund.Vk_group_import.handle_import_request(item, recieved_str)
+				elif recieved_str.find(u'лит') != -1 and recieved_str.find(u'айди') != -1:
+					pass
 			recieved_str = u''
 			time.sleep(1)
 	@staticmethod
