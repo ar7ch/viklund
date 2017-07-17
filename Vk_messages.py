@@ -9,6 +9,12 @@ import viklund
 
 class Vk_messages:
 	@staticmethod
+	def handle_id_request(item):
+		user = viklund.vkApi.users.get(user_ids=item[u'user_id'])
+		username = user[0]['first_name'] + ' ' + user[0]['last_name']
+		user = None
+		viklund.Vk_messages.send_selective(item, 'msg', username + ': ' + str(item[u'user_id']))
+	@staticmethod
 	def handle_messages():
 		values = {'out': 0,'count': 100,'time_offset': 60}
 		while True:
@@ -23,7 +29,7 @@ class Vk_messages:
 				elif recieved_str.find(u'лит') != -1 and recieved_str.find(u'пост') != -1:
 					viklund.Vk_group_import.handle_import_request(item, recieved_str)
 				elif recieved_str.find(u'лит') != -1 and recieved_str.find(u'айди') != -1:
-					pass
+					viklund.Vk_messages.handle_id_request(item)
 			recieved_str = u''
 			time.sleep(1)
 	@staticmethod
