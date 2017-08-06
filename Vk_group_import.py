@@ -28,8 +28,10 @@ class Vk_group_import:
 		posts = viklund.vkApi.wall.get(owner_id = group_id)
 		self.set_posts_count(posts['count'])
 		while True:
-			group_wall = viklund.vkApi.wall.get(count = 1, offset = random.randint(1, self.get_posts_count()), owner_id = self.get_group_id()) 
+			group_wall = viklund.vkApi.wall.get(count = 1, offset = random.randint(1, self.get_posts_count() * 2), owner_id = self.get_group_id()) 
 			try:
+				if int(group_wall['items'][0]['marked_as_ads']):
+					raise
 				if type_flag == 'pic':
 					pic = u'photo' + str(group_id) + '_' + str(group_wall['items'][0]['attachments'][0]['photo']['id'])
 					print(pic)

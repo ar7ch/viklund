@@ -1,4 +1,3 @@
-import time
 import vk_api
 import random
 import json
@@ -8,6 +7,17 @@ import sys
 import getpass
 import viklund
 import configparser
+from datetime import datetime
+
+class output_colors:
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
 
 class Vk_system():
 	@staticmethod
@@ -84,22 +94,30 @@ class Vk_system():
 			except OSError:
 				log_file = open(log_location, 'a')
 			finally:
-				viklund.Vk_system.log_selective(item, log_file, recieved_str)
+				viklund.Vk_system.log_messages(item, log_file, recieved_str)
 				log_file.close()
 		elif viklund.logs_policy == 2:
-			viklund.Vk_system.log_selective(item, None, recieved_str)
+			viklund.Vk_system.log_messages(item, None, recieved_str)
 	@staticmethod
-	def log_selective(item, log_file, recieved_str):
-		if viklund.logs_policy == 1:
+	def log_messages(item, log_file, recieved_str):
+		if viklund.logs_policy == 1 or viklund.logs_policy == 2:
+			user = viklund.vkApi.users.get(user_ids=item[u'user_id'])
+			username = user[0]['first_name'] + ' ' + user[0]['last_name'] + ' '
+			user = None
 			if viklund.Vk_messages.check_if_chat(item):
-				log_file.write('user c id ' + str(item[u'user_id']) + ' в беседе с id ' + str(item[u'chat_id']) + ' написал: ' + recieved_str + '\n')
+				output_str = username + '(' + 'id ' + str(item[u'user_id']) + ') ' + 'в беседе с id ' + str(item[u'chat_id']) + ' в ' + datetime.fromtimestamp(item['date']).strftime('%d/%m/%Y %H:%M:%S') + ': ' + recieved_str
+				viklund.Vk_system.log_selective(item, log_file, output_str)
 			else:
-				log_file.write('user c id ' + str(item[u'user_id']) + ' написал: ' + recieved_str + '\n')
-		elif viklund.logs_policy == 2:
-			if viklund.Vk_messages.check_if_chat(item):
-				print('user c id ' + str(item[u'user_id']) + ' в беседе с id ' + str(item[u'chat_id']) + ' написал: ' + recieved_str)
-			else:
-				print('user c id ' + str(item[u'user_id']) + ' написал: ' + recieved_str)
+				output_str = username + '(' + 'id ' + str(item[u'user_id']) + ') ' + 'в личном сообщении в ' + datetime.fromtimestamp(item['date']).strftime('%H:%M:%S %d/%m/%Y') + ': ' + recieved_str
+				viklund.Vk_system.log_selective(item, None, output_str)
+	@staticmethod
+	def log_selective(item, log_file, output_str):
+		if viklund.logs_policy == 1 or viklund.logs_policy == 2:
+			time_now = '[' + datetime.now().strftime('%Y-%m-%d %H:%M:%S') + '] '
+			if viklund.logs_policy == 1:
+				log_file.write(time_now + output_str + '\n')
+			elif viklund.logs_policy == 2:
+				print(time_now + output_str)
 	@staticmethod
 	def vk_auth():
 		try:
