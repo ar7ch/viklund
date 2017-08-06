@@ -32,6 +32,7 @@ class Vk_group_import:
 			try:
 				if type_flag == 'pic':
 					pic = u'photo' + str(group_id) + '_' + str(group_wall['items'][0]['attachments'][0]['photo']['id'])
+					print(pic)
 					viklund.Vk_messages.send_selective(item, 'pic', pic)
 				elif type_flag == 'msg':
 					msg = group_wall['items'][0]['text']

@@ -22,8 +22,23 @@ class Vk_messages:
 					viklund.Vk_random.handle_random(item, recieved_str)
 				elif recieved_str.find(u'лит') != -1 and recieved_str.find(u'пост') != -1:
 					viklund.Vk_group_import.handle_import_request(item, recieved_str)
+				elif recieved_str.find(u'лит') != -1 and recieved_str.find(u'перешли') != -1:
+					viklund.Vk_messages.resend_user_message(item, recieved_str)
 			recieved_str = u''
 			time.sleep(1)
+	@staticmethod
+	def resend_user_message(item, recieved_str):
+		try:
+			access_key = ''
+			try:
+				access_key = '_' + str(item['attachments'][0]['photo']['access_key'])
+			except:
+				access_key = ''
+			pic = u'photo' + str(item['attachments'][0]['photo']['owner_id']) + '_' + str(item['attachments'][0]['photo']['id']) + access_key
+			viklund.Vk_messages.send_selective(item, 'pic', pic)
+		except Exception as e:
+			Vk_messages.send_selective(item, 'msg', u'Произошла ошибка!')
+			return -1
 	@staticmethod
 	def check_if_chat(item):
 		if u'chat_id' in item and item[u'chat_id'] != u'':
