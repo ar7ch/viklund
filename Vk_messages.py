@@ -35,16 +35,18 @@ class Vk_messages:
 			recieved_str = u''
 			time.sleep(1)
 	@staticmethod
-	def resend_user_message(item, recieved_str):
+	def resend_user_message(item, recieved_str): #TODO: send multiply pictures in one message
 		try:
-			access_key = ''
-			try:
-				access_key = '_' + str(item['attachments'][0]['photo']['access_key'])
-			except:
+			for picture in item['attachments']:
 				access_key = ''
-			pic = u'photo' + str(item['attachments'][0]['photo']['owner_id']) + '_' + str(item['attachments'][0]['photo']['id']) + access_key
-			viklund.Vk_messages.send_selective(item, 'pic', pic)
+				try:
+					access_key = '_' + str(picture['photo']['access_key'])
+				except:
+					access_key = ''
+				pic = u'photo' + str(picture['photo']['owner_id']) + '_' + str(picture['photo']['id']) + access_key
+				viklund.Vk_messages.send_selective(item, 'pic', pic)
 		except Exception as e:
+			print(e)
 			Vk_messages.send_selective(item, 'msg', u'Произошла ошибка!')
 			return -1
 	@staticmethod
