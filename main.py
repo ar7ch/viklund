@@ -1,4 +1,5 @@
 import viklund
+import time
 
 def handle_messages():
 	values = {'out': 0,'count': 100,'time_offset': 60}
