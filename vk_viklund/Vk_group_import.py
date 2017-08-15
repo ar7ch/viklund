@@ -75,7 +75,7 @@ class Vk_group_import:
 			if request == '':
 				group_import.get_import_list(item, json_data, 'default');
 				return 0
-			if not default_search_result:
+			if not search_result:
 				raise Import_command_not_found_exception()
 		except Import_command_not_found_exception:
 			viklund.Vk_messages.send_selective(item, 'msg', request + ': запрос не найден')
@@ -84,9 +84,7 @@ class Vk_group_import:
 			group_import.select_and_send_random_group_thing(group_import.get_group_id(), item, group_import.get_import_type()) 
 	
 	def read_json(self, filename, path):
-		pathname = os.path.abspath(os.path.dirname(sys.argv[0])) #get absolute path current dir (where the script is)
-		pathname = os.path.join(pathname, 'vk_json_tables')
-		with open(pathname + '/' + filename + '.json') as json_file:
+		with open(path + '/' + filename + '.json') as json_file:
 			json_data = json.load(json_file)
 		return json_data
 	def search_json(self, json_data, request_str, filename):

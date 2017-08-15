@@ -13,17 +13,20 @@ def handle_messages():
 			#ваш код для обработки сообщений пользователей начинается здесь
 			recieved_str = item[u'body'].lower()
 			viklund.Vk_system.print_log(item, recieved_str, None)
-			if recieved_str[0] == '/': #синтаксис команд: /command
-				if recieved_str.find(u'рандом') != -1:
-					viklund.Vk_random.handle_random(item, recieved_str)
-				elif recieved_str.find(u'пост') != -1:
-					viklund.Vk_group_import.handle_import_request(item, recieved_str, JSON_PATH)
-				elif recieved_str.find(u'перешли') != -1:
-					viklund.Vk_messages.resend_user_message(item, recieved_str)
-				elif recieved_str.find(u'айди') != -1:
-					viklund.Vk_messages.handle_id_request(item)
-				else:
-					viklund.Vk_messages.send_selective(item, msg, recieved_str[1:] + ': команда не найдена')
+			try:
+				if recieved_str[0] == '/': #синтаксис команд: /command
+					if recieved_str.find(u'рандом') != -1:
+						viklund.Vk_random.handle_random(item, recieved_str)
+					elif recieved_str.find(u'пост') != -1:
+						viklund.Vk_group_import.handle_import_request(item, recieved_str, JSON_PATH)
+					elif recieved_str.find(u'перешли') != -1:
+						viklund.Vk_messages.resend_user_message(item, recieved_str)
+					elif recieved_str.find(u'айди') != -1:
+						viklund.Vk_messages.handle_id_request(item)
+					else:
+						viklund.Vk_messages.send_selective(item, 'msg', recieved_str[1:] + ': команда не найдена')
+			except Exception as e:
+				print(e)
 			recieved_str = u''
 		time.sleep(1)
 
