@@ -61,38 +61,29 @@ class Vk_group_import:
 		commands = ''
 		for items in json_data[filename]:
 			commands += items['call_command'] + '\n'
-		viklund.Vk_messages.send_selective(item, 'msg', 'Использование: \'Лит, пост <команда>\'\nДоступные команды:\n' + commands)
+		viklund.Vk_messages.send_selective(item, 'msg', 'Использование: \'/пост <команда>\'\nДоступные команды:\n' + commands)
 
 	@staticmethod
-	def handle_import_request(item, recieved_str):
+	def handle_import_request(item, recieved_str, pathname):
 		group_import = viklund.Vk_group_import()
 		request = group_import.get_request_str(recieved_str)
 		if viklund.Vk_messages.check_if_chat(item):
 			chat_id = item[u'chat_id']
 		try:
-			json_data = group_import.read_json('default')
-			default_search_result = group_import.search_json(json_data, request, 'default')
+			json_data = group_import.read_json('default', pathname)
+			search_result = group_import.search_json(json_data, request, 'default')
 			if request == '':
 				group_import.get_import_list(item, json_data, 'default');
 				return 0
-			#if not default_search_result:
-			#if not viklund.Vk_messages.check_if_chat(item):
 			if not default_search_result:
 				raise Import_command_not_found_exception()
-				#json_data = self.read_json('chat_id'+str(chat_id))
-				#chat_search_result = self.search_json(json_data, request, 'chat_id'+str(chat_id))
-				#if default_search_result or chat_search_result:
-				#	raise Import_command_not_found_exception()
-		except viklund.Private_messages_import_prohibited_exception:
-			viklund.Vk_messages.send_selective(item, 'msg', request + 'Извините, в личных сообщениях доступны только стандартные импорты!')
-			return 3
 		except Import_command_not_found_exception:
 			viklund.Vk_messages.send_selective(item, 'msg', request + ': запрос не найден')
-			return 2
+			return 1
 		else:
 			group_import.select_and_send_random_group_thing(group_import.get_group_id(), item, group_import.get_import_type()) 
 	
-	def read_json(self, filename):
+	def read_json(self, filename, path):
 		pathname = os.path.abspath(os.path.dirname(sys.argv[0])) #get absolute path current dir (where the script is)
 		pathname = os.path.join(pathname, 'vk_json_tables')
 		with open(pathname + '/' + filename + '.json') as json_file:
