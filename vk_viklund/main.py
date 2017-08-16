@@ -14,7 +14,7 @@ def handle_messages():
 			recieved_str = item[u'body'].lower()
 			viklund.Vk_system.print_log(item, recieved_str, None)
 			try:
-				if recieved_str[0] == '/': #синтаксис команд: /command
+				if len(recieved_str) > 1 and recieved_str[0] == '/': #синтаксис команд: /command
 					if recieved_str.find(u'рандом') != -1:
 						viklund.Vk_random.handle_random(item, recieved_str)
 					elif recieved_str.find(u'пост') != -1:
@@ -23,11 +23,13 @@ def handle_messages():
 						viklund.Vk_messages.resend_user_message(item, recieved_str)
 					elif recieved_str.find(u'айди') != -1:
 						viklund.Vk_messages.handle_id_request(item)
+					elif recieved_str.find(u'помощь') != -1:
+						viklund.Vk_messages.send_selective(item, 'msg', 'Viklund Bot\nИспользование: \'/команда\'\nДоступные команды:\nпост\nрандом\nперешли\nайди\nпомощь')
 					else:
 						viklund.Vk_messages.send_selective(item, 'msg', recieved_str[1:] + ': команда не найдена')
+					recieved_str = u''
 			except Exception as e:
 				print(e)
-			recieved_str = u''
 		time.sleep(1)
 
 def main():
