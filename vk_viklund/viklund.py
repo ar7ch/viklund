@@ -21,4 +21,4 @@ from Vk_system import *
 
 vk = None
 vkApi = None 
-logs_policy = None
+logs_policy = ''

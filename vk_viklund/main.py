@@ -25,7 +25,7 @@ def handle_messages():
 		if response['items']:
 			values['last_message_id'] = response['items'][0]['id']
 		for item in response['items']:
-			#ваш код для обработки сообщений пользователей начинается здесь
+			#your user messages handling code starts here
 			recieved_str = item[u'body'].lower()
 			viklund.Vk_system.print_log(item, recieved_str, None)
 			try:
@@ -44,12 +44,12 @@ def handle_messages():
 						viklund.Vk_messages.send_selective(item, 'msg', recieved_str[1:] + ': команда не найдена')
 					recieved_str = u''
 			except Exception as e:
-				print(e)
+				viklund.Vk_system.log_selective()
 		time.sleep(1)
 
 def main():
-	viklund.vk = viklund.Vk_system.vk_auth()
-	viklund.Vk_system.ask_logs()
+	args = viklund.Vk_system.handle_args();
+	viklund.vk = viklund.Vk_system.vk_auth(args); del args
 	viklund.vkApi = viklund.vk.get_api()
 	handle_messages()
 if __name__ == "__main__":
