@@ -41,10 +41,19 @@ class Vk_system():
 		arg_parser.add_argument ('-g', '--log', choices=['file', 'stdout',], default='file', type=str, action='store', help='select log type') #select logs output type
 		arg_parser.add_argument('-l', '--login', nargs='?', type=str, action='store', help='input login, UNSAFE, USE CAREFULLY') #
 		arg_parser.add_argument('-p', '--password', nargs='?', type=str, action='store', help='input password, UNSAFE, USE CAREFULLY')
-		arg_parser.parse_args(sys.argv[1:])
-		return arg_parser
+		args_namespace = arg_parser.parse_args(sys.argv[1:])
+		#it is better to just override stdout descriptor, so let's do this
+		#fileno
+		log_file = None
+		try:	
+			log_file = open(log_location, 'x')
+		except OSError:
+			log_fd = open(log_location, 'a')
+		log_fd_dup = os.dup(log_fd)
+		os.dup2(log_fd, sys.stdout)
 
-	@staticmethod
+		return args_namespace
+	@staticmethod	
 	def print_log(item, recieved_str, type):
 		if viklund.logs_policy == 1:
 			pathname = os.path.abspath(os.path.dirname(sys.argv[0])) #get absolute path to current dir (where the script is)
@@ -80,18 +89,36 @@ class Vk_system():
 			elif viklund.logs_policy == 2:
 				print(time_now + output_str)
 	@staticmethod
-	def vk_auth(args):
-		try:
-			print('Viklund v.0.4')
-			vk_login = input('Login:')
-			vk_passwd = getpass.getpass('Password:')
-			vk = vk_api.VkApi(login = vk_login, password = vk_passwd)
-			vk.auth()
-			vk_login = ''
-			vk_passwd = ''
-			return vk
-		except vk_api.AuthError as error_msg:
-			print(error_msg)
-			exit(1)
-		finally:
-			print('Auth successful')
+	def vk_auth(args_namespace):
+			"""
+			apparently most users may want to launch the bot in the terminal (e.g. ssh) and then close that shell
+			but we don't want our process to be closed
+			so we do auth procedure, clone process with fork() and kill the parent process
+			even if user closes terminal, the process will be alive
+			"""
+			pid = os.fork()
+			if pid: #parent process code goes here (pid > 0)
+				print('Viklund v.0.4')
+				vk_login = ''
+				vk_passwd = ''
+				try:
+					#if user haven't provided login as commandline argument, we'll ask him for this
+					#otherwise, we'll just copy login from namespace variable to local variable
+					if not args_namespace.login: 
+						vk_login = input('Login:')
+					else
+						vk_login = args_namespace.login
+					#same for password
+					if not args_namespace.password:
+						vk_passwd = getpass.getpass('Password:')
+					else
+						vk_passwd = args_namespace.password
+					vk = vk_api.VkApi(login = vk_login, password = vk_passwd)
+					vk.auth()
+					del vk_login; del vk_passwd; del args_namespace #i think it's safer to delete import variables manually
+					viklund.vk = vk
+					exit(0)
+					print('Auth successful, bot started with PID is ' + str(pid))
+				except vk_api.AuthError as error_msg:
+					print(error_msg)
+					exit(1)
