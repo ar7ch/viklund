@@ -36,58 +36,41 @@ class output_colors:
 
 class Vk_system():
 	@staticmethod
+	def error(message):
+		print(output_colors.BOLD + output_colors.FAIL + 'ERROR: ' + output_colors.ENDC + message, file=sys.stderr)
+		exit(1)
+	@staticmethod
 	def handle_args():
 		arg_parser = argparse.ArgumentParser()
 		arg_parser.add_argument ('-g', '--log', choices=['file', 'stdout',], default='file', type=str, action='store', help='select log type') #select logs output type
 		arg_parser.add_argument('-l', '--login', nargs='?', type=str, action='store', help='input login, UNSAFE, USE CAREFULLY') #
 		arg_parser.add_argument('-p', '--password', nargs='?', type=str, action='store', help='input password, UNSAFE, USE CAREFULLY')
 		args_namespace = arg_parser.parse_args(sys.argv[1:])
-		#it is better to just override stdout descriptor, so let's do this
-		#fileno
+		pathname = os.path.abspath(os.path.dirname(sys.argv[0])) #get absolute path to current dir (where the script is)
+		pathname = os.path.join(pathname, 'vk_logs')
 		log_file = None
 		try:	
 			log_file = open(log_location, 'x')
-		except OSError:
+		except OSError.FileExistsError:
 			log_fd = open(log_location, 'a')
-		log_fd_dup = os.dup(log_fd)
-		os.dup2(log_fd, sys.stdout)
-
+		except Exception as e:
+			viklund.Vk_system.error("unable to write to log file\n" + e)
+		#we just override stdout and stderr file descriptors, it's more convenient
+		file_fd = log_file.fileno()
+		dup_fd = os.dup(file_fd)
+		os.dup2(file_fd, sys.stdout.fileno())
+		os.dup2(dup_fd, sys.stderr.fileno())
 		return args_namespace
 	@staticmethod	
-	def print_log(item, recieved_str, type):
-		if viklund.logs_policy == 1:
-			pathname = os.path.abspath(os.path.dirname(sys.argv[0])) #get absolute path to current dir (where the script is)
-			pathname = os.path.join(pathname, 'vk_logs')
-			log_file = None
-			try:	
-				log_file = open(log_location, 'x')
-			except OSError:
-				log_file = open(log_location, 'a')
-			finally:
-				viklund.Vk_system.log_messages(item, log_file, recieved_str)
-				log_file.close()
-		elif viklund.logs_policy == 'stdout':
-			viklund.Vk_system.log_messages(item, None, recieved_str)
-	@staticmethod
-	def log_messages(item, log_file, recieved_str):
-		if viklund.logs_policy == 1 or viklund.logs_policy == 2:
-			user = viklund.vkApi.users.get(user_ids=item[u'user_id'])
-			username = user[0]['first_name'] + ' ' + user[0]['last_name'] + ' '
-			user = None
-			if viklund.Vk_messages.check_if_chat(item):
-				output_str = username + '(' + 'id ' + str(item[u'user_id']) + ') ' + 'в беседе с id ' + str(item[u'chat_id']) + ' в ' + datetime.fromtimestamp(item['date']).strftime('%d/%m/%Y %H:%M:%S') + ': ' + recieved_str
-				viklund.Vk_system.log_selective(item, log_file, output_str)
-			else:
-				output_str = username + '(' + 'id ' + str(item[u'user_id']) + ') ' + 'в личном сообщении в ' + datetime.fromtimestamp(item['date']).strftime('%H:%M:%S %d/%m/%Y') + ': ' + recieved_str
-				viklund.Vk_system.log_selective(item, None, output_str)
+	def log_messages(recieved_str):
+		#earlier, this function could track users' IDs and names
+		#let's respect privacy
+		output_str = 'Пользователь в ' + datetime.fromtimestamp(item['date']).strftime('%d/%m/%Y %H:%M:%S') + ' вызвал команду: ' + recieved_str
+		log_messages(output_str)
 	@staticmethod
 	def log_selective(item, log_file, output_str):
-		if viklund.logs_policy == 1 or viklund.logs_policy == 2:
-			time_now = '[' + datetime.now().strftime('%Y-%m-%d %H:%M:%S') + '] '
-			if viklund.logs_policy == 1:
-				log_file.write(time_now + output_str + '\n')
-			elif viklund.logs_policy == 2:
-				print(time_now + output_str)
+		time_now = '[' + datetime.now().strftime('%Y-%m-%d %H:%M:%S') + '] '
+			print(time_now + output_str)
 	@staticmethod
 	def vk_auth(args_namespace):
 			"""
