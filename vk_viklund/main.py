@@ -16,6 +16,8 @@
 import viklund
 import time
 import os, sys
+from datetime import datetime
+
 
 JSON_PATH = os.path.abspath(os.path.dirname(sys.argv[0])) 
 def handle_messages():
@@ -26,30 +28,35 @@ def handle_messages():
 			values['last_message_id'] = response['items'][0]['id']
 		for item in response['items']:
 			#your user messages handling code starts here
-			recieved_str = item[u'body'].lower()
-			viklund.Vk_system.print_log(item, recieved_str, None)
-			try:
-				if len(recieved_str) > 1 and recieved_str[0] == '/': #синтаксис команд: /command
-					if recieved_str.find(u'рандом') != -1:
-						viklund.Vk_random.handle_random(item, recieved_str)
-					elif recieved_str.find(u'пост') != -1:
-						viklund.Vk_group_import.handle_import_request(item, recieved_str, JSON_PATH)
-					elif recieved_str.find(u'перешли') != -1:
-						viklund.Vk_messages.resend_user_message(item, recieved_str)
-					elif recieved_str.find(u'айди') != -1:
-						viklund.Vk_messages.handle_id_request(item)
-					elif recieved_str.find(u'помощь') != -1:
-						viklund.Vk_messages.send_selective(item, 'msg', 'Viklund Bot\nИспользование: \'/команда\'\nДоступные команды:\nпост\nрандом\nперешли\nайди\nпомощь')
-					else:
-						viklund.Vk_messages.send_selective(item, 'msg', recieved_str[1:] + ': команда не найдена')
-					recieved_str = u''
-			except Exception as e:
-				viklund.Vk_system.log_selective()
+			received_str = item[u'body'].lower()
+			#try:
+				#handle messages that only begin with slash
+			if len(received_str) > 1 and received_str[0] == '/':
+				viklund.Vk_system.log_messages(item, received_str)
+				if received_str.find(u'рандом') != -1:
+					viklund.Vk_random.handle_random(item, received_str)
+				elif received_str.find(u'пост') != -1:
+					viklund.Vk_group_import.handle_import_request(item, received_str, JSON_PATH)
+				elif received_str.find(u'перешли') != -1:
+					viklund.Vk_messages.resend_user_message(item, received_str)
+				elif received_str.find(u'айди') != -1:
+					viklund.Vk_messages.handle_id_request(item)
+				elif received_str.find(u'помощь') != -1:
+					viklund.Vk_messages.send_selective(item, 'msg', 'Viklund Bot\nИспользование: \'/команда\'\nДоступные команды:\nпост\nрандом\nперешли\nайди\nпомощь')
+				#hidden feature
+				elif received_str.find(u'статус') != -1:
+					viklund.Vk_messages.send_selective(item, 'msg', 'Viklund v.0.4\nСтатус: up\nВремя на сервере: ' + datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+				else:
+					viklund.Vk_messages.send_selective(item, 'msg', received_str[1:] + ': команда не найдена')
+				received_str = u''
+			#except IndexError as e:
+			#	print(e)
+			#	viklund.Vk_system.echo_log(viklund.Vk_system.warning(str(e), return_message=True))
 		time.sleep(1)
 
 def main():
 	args = viklund.Vk_system.handle_args();
-	viklund.Vk_system.vk_auth(args); del args
+	viklund.vk = viklund.Vk_system.vk_auth(args)
 	viklund.vkApi = viklund.vk.get_api()
 	handle_messages()
 if __name__ == "__main__":

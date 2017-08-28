@@ -33,12 +33,52 @@ class output_colors:
     ENDC = '\033[0m'
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
-
 class Vk_system():
 	@staticmethod
-	def error(message):
-		print(output_colors.BOLD + output_colors.FAIL + 'ERROR: ' + output_colors.ENDC + message, file=sys.stderr)
-		exit(1)
+	def success(message, return_message=False): #returning colored success message, gonna be useful for logging
+		success_message = output_colors.BOLD + output_colors.OKGREEN + 'OK: ' + output_colors.ENDC + message
+		if not return_message:
+			print(success_message, file=sys.stderr)
+		else:
+			return success_message
+	@staticmethod
+	def warning(message, return_message=False): #returning colored warning message, gonna be useful for logging
+		warning_message = output_colors.BOLD + output_colors.WARNING + 'WARNING: ' + output_colors.ENDC + message
+		if not return_message:
+			print(warning_message, file=sys.stderr)
+		else:
+			return warning_message
+	@staticmethod
+	def error(message, return_message=False): #returning colored error message, gonna be useful for logging
+		error_message = output_colors.BOLD + output_colors.FAIL + 'ERROR: ' + output_colors.ENDC + message
+		if not return_message:
+			print(error_message, file=sys.stderr)
+			exit(1)
+		else: #exit will always work, nevertheless i'm using else
+			return error_message
+
+	@staticmethod
+	def override_fd():
+		dir = os.path.abspath(os.path.dirname(sys.argv[0])) #get absolute path to current dir (where the script is)
+		log_dir = os.path.join(dir, 'vk_logs')
+		try:
+			os.mkdir(os.path.abspath(log_dir), 0o777)
+		except OSError as e:
+			if e.errno != errno.EEXIST:
+				raise
+		file = log_dir + '/viklund.log'
+		log_file = None
+		try:	
+			log_file = open(file, 'x')
+		except OSError:
+			log_file = open(file, 'a')
+		except Exception as e:
+			viklund.Vk_system.error("unable to write to log file\n" + str(e))
+		#we just override stdout and stderr file descriptors, it's more convenient
+		file_fd = log_file.fileno()
+		dup_fd = os.dup(file_fd)
+		os.dup2(file_fd, sys.stdout.fileno())
+		os.dup2(dup_fd, sys.stderr.fileno())
 	@staticmethod
 	def handle_args():
 		arg_parser = argparse.ArgumentParser()
@@ -46,62 +86,53 @@ class Vk_system():
 		arg_parser.add_argument('-l', '--login', nargs='?', type=str, action='store', help='input login, UNSAFE, USE CAREFULLY') #
 		arg_parser.add_argument('-p', '--password', nargs='?', type=str, action='store', help='input password, UNSAFE, USE CAREFULLY')
 		args_namespace = arg_parser.parse_args(sys.argv[1:])
-		pathname = os.path.abspath(os.path.dirname(sys.argv[0])) #get absolute path to current dir (where the script is)
-		pathname = os.path.join(pathname, 'vk_logs')
 		log_file = None
-		try:	
-			log_file = open(log_location, 'x')
-		except OSError.FileExistsError:
-			log_fd = open(log_location, 'a')
-		except Exception as e:
-			viklund.Vk_system.error("unable to write to log file\n" + e)
-		#we just override stdout and stderr file descriptors, it's more convenient
-		file_fd = log_file.fileno()
-		dup_fd = os.dup(file_fd)
-		os.dup2(file_fd, sys.stdout.fileno())
-		os.dup2(dup_fd, sys.stderr.fileno())
 		return args_namespace
 	@staticmethod	
-	def log_messages(recieved_str):
+	def log_messages(item, received_str):
 		#earlier, this function could track users' IDs and names
 		#let's respect privacy
-		output_str = 'Пользователь в ' + datetime.fromtimestamp(item['date']).strftime('%d/%m/%Y %H:%M:%S') + ' вызвал команду: ' + recieved_str
-		log_messages(output_str)
+		output_str = 'Пользователь в ' + datetime.fromtimestamp(item['date']).strftime('%d/%m/%Y %H:%M:%S') + ' вызвал команду: ' + received_str
+		viklund.Vk_system.echo_log(output_str)
 	@staticmethod
-	def log_selective(item, log_file, output_str):
+	def echo_log(output_str):
 		time_now = '[' + datetime.now().strftime('%Y-%m-%d %H:%M:%S') + '] '
-			print(time_now + output_str)
+		print(time_now + output_str)
 	@staticmethod
 	def vk_auth(args_namespace):
+			vk = None
+			print('Viklund v.0.4')
+			#if user haven't provided login as commandline argument, we'll ask him for this
+			#otherwise, we'll just copy login from namespace variable to local variable
+			if not args_namespace.login: 
+				vk_login = input('Login:')
+			else:
+				vk_login = args_namespace.login
+			#same for password
+			if not args_namespace.password:
+				vk_passwd = getpass.getpass('Password:')
+			else:
+				vk_passwd = args_namespace.password
 			"""
 			apparently most users may want to launch the bot in the terminal (e.g. ssh) and then close that shell
 			but we don't want our process to be closed
 			so we do auth procedure, clone process with fork() and kill the parent process
 			even if user closes terminal, the process will be alive
 			"""
+			try:
+				#get VK API access
+				vk = vk_api.VkApi(login = vk_login, password = vk_passwd)
+				vk.auth()
+				del vk_login; del vk_passwd; del args_namespace #i think it's safer to delete import variables manually
+				#viklund.vk = vk
+			except vk_api.AuthError as error_msg:
+				print(error_msg)
+				#viklund.Vk_system.error(error_msg)
+				exit(1)
 			pid = os.fork()
 			if pid: #parent process code goes here (pid > 0)
-				print('Viklund v.0.4')
-				vk_login = ''
-				vk_passwd = ''
-				try:
-					#if user haven't provided login as commandline argument, we'll ask him for this
-					#otherwise, we'll just copy login from namespace variable to local variable
-					if not args_namespace.login: 
-						vk_login = input('Login:')
-					else
-						vk_login = args_namespace.login
-					#same for password
-					if not args_namespace.password:
-						vk_passwd = getpass.getpass('Password:')
-					else
-						vk_passwd = args_namespace.password
-					vk = vk_api.VkApi(login = vk_login, password = vk_passwd)
-					vk.auth()
-					del vk_login; del vk_passwd; del args_namespace #i think it's safer to delete import variables manually
-					viklund.vk = vk
-					exit(0)
-					print('Auth successful, bot started with PID is ' + str(pid))
-				except vk_api.AuthError as error_msg:
-					print(error_msg)
-					exit(1)
+				viklund.Vk_system.success('Auth successful, bot started with PID ' + str(pid))
+				exit(0)
+			else: #child process code goes here
+				viklund.Vk_system.override_fd()
+				return vk

@@ -64,13 +64,13 @@ class Vk_group_import:
 					return -1
 				watchdog_counter += 1
 				continue
-	def get_request_str(self, recieved_str):
-		start_index = recieved_str.find('пост')
+	def get_request_str(self, received_str):
+		start_index = received_str.find('пост')
 		start_index += 4
 		request_str = ''
-		for i in range(start_index, len(recieved_str)):
-			if recieved_str[i].isalpha() or recieved_str[i].isdigit():
-				request_str += recieved_str[i]
+		for i in range(start_index, len(received_str)):
+			if received_str[i].isalpha() or received_str[i].isdigit():
+				request_str += received_str[i]
 		return request_str
 	def get_import_list(self, item, json_data, filename):
 		commands = ''
@@ -79,9 +79,9 @@ class Vk_group_import:
 		viklund.Vk_messages.send_selective(item, 'msg', 'Использование: \'/пост <команда>\'\nДоступные команды:\n' + commands)
 
 	@staticmethod
-	def handle_import_request(item, recieved_str, pathname):
+	def handle_import_request(item, received_str, pathname):
 		group_import = viklund.Vk_group_import()
-		request = group_import.get_request_str(recieved_str)
+		request = group_import.get_request_str(received_str)
 		if viklund.Vk_messages.check_if_chat(item):
 			chat_id = item[u'chat_id']
 		try:

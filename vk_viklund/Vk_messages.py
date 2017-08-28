@@ -30,7 +30,7 @@ class Vk_messages:
 		user = None
 		viklund.Vk_messages.send_selective(item, 'msg', username + ': ' + str(item[u'user_id']))
 	@staticmethod
-	def resend_user_message(item, recieved_str): #TODO: send multiply pictures in one message, resend via forwarded messages
+	def resend_user_message(item, received_str): #TODO: send multiply pictures in one message, resend via forwarded messages
 		try:
 			for picture in item['attachments']:
 				access_key = ''

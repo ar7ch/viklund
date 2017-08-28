@@ -24,10 +24,10 @@ import viklund
 
 class Vk_random:
 	@staticmethod
-	def handle_random(item, recieved_str):
+	def handle_random(item, received_str):
 		rand = viklund.Vk_random()
 		rand.set_toggle_random(True)
-		status_code = rand.find_a_b(recieved_str)
+		status_code = rand.find_a_b(received_str)
 		if status_code == -1:
 			rand.abort_random(item, 0)
 		elif status_code == 1:
@@ -42,11 +42,11 @@ class Vk_random:
 	def success_random(self, item):
 		self.set_toggle_random(False)
 		viklund.Vk_messages.send_selective(item, 'msg', u'Успешно! Ваше случайное число в диапазоне от ' + str(min(self.get_a(), self.get_b())) + u' до ' + str(max(self.get_a(), self.get_b())) + u': ' + str(self.get_result()))
-	def find_a_b(self, recieved_str):
+	def find_a_b(self, received_str):
 		self.set_a('')
 		self.set_b('') 
 		counter = 0
-		for symbol in recieved_str:
+		for symbol in received_str:
 			if '1234567890'.find(symbol) != -1:
 				counter += 1
 		if counter < 2:
@@ -55,7 +55,7 @@ class Vk_random:
 			got_a_flag = False
 			got_b_flag = False
 			digit_flag = False
-			for symbol in recieved_str:
+			for symbol in received_str:
 				if symbol.isdigit() and not got_a_flag and not got_b_flag:
 					digit_flag = True
 					self.set_a(self.get_a() + symbol)
