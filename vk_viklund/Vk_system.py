@@ -14,7 +14,6 @@
 #along with viklund.  If not, see <http://www.gnu.org/licenses/>.
 
 import vk_api
-import random
 import json
 import os
 import errno
@@ -95,9 +94,20 @@ class Vk_system():
 		output_str = 'Пользователь в ' + datetime.fromtimestamp(item['date']).strftime('%d/%m/%Y %H:%M:%S') + ' вызвал команду: ' + received_str
 		viklund.Vk_system.echo_log(output_str)
 	@staticmethod
-	def echo_log(output_str):
+	def echo_log(output_str, output_mode=None):
+		additional_string = ''
+		if output_mode != None:
+			output_color = output_colors.HEADER + output_str + output_colors.ENDC #highlight important messages
+			if output_mode == 'success':
+				additional_string = output_colors.BOLD + output_colors.OKGREEN + 'OK: ' + output_colors.ENDC
+			elif output_mode == 'warning':
+				additional_string = output_colors.BOLD + output_colors.WARNING + 'WARNING: ' + output_colors.ENDC
+			elif output_mode == 'error':
+				additional_string = output_colors.BOLD + output_colors.FAIL + 'ERROR: ' + output_colors.ENDC
 		time_now = '[' + datetime.now().strftime('%Y-%m-%d %H:%M:%S') + '] '
-		print(time_now + output_str)
+		print(time_now + additional_string + output_str, file = sys.stderr)
+		if output_mode == 'error':
+			exit(0)
 	@staticmethod
 	def vk_auth(args_namespace):
 			vk = None
@@ -124,15 +134,15 @@ class Vk_system():
 				vk = vk_api.VkApi(login = vk_login, password = vk_passwd)
 				vk.auth()
 				del vk_login; del vk_passwd; del args_namespace #i think it's safer to delete import variables manually
-				#viklund.vk = vk
 			except vk_api.AuthError as error_msg:
-				print(error_msg)
-				#viklund.Vk_system.error(error_msg)
-				exit(1)
+				viklund.Vk_system.echo_log('Unable to log in. Please check that you have entered your login and password correctly.', output_mode='error')
 			pid = os.fork()
 			if pid: #parent process code goes here (pid > 0)
-				viklund.Vk_system.success('Auth successful, bot started with PID ' + str(pid))
+				viklund.Vk_system.echo_log('Auth successful, bot started with PID ' + str(pid), output_mode='success')
+				viklund.Vk_system.override_fd()
+				#output another to log file
+				viklund.Vk_system.echo_log('Auth successful, bot started with PID ' + str(pid), output_mode='success')
 				exit(0)
 			else: #child process code goes here
-				viklund.Vk_system.override_fd()
+				viklund.Vk_system.override_fd()	
 				return vk
