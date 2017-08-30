@@ -88,6 +88,8 @@ class Vk_system():
 		args_namespace = arg_parser.parse_args(sys.argv[1:])
 		if args_namespace.json_path:
 			viklund.JSON_PATH = args_namespace.json_path
+		else:
+			viklund.JSON_PATH = os.path.abspath(os.path.dirname(sys.argv[0])) + '/default.json'
 		log_file = None
 		return args_namespace
 	@staticmethod	

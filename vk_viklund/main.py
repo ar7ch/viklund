@@ -52,7 +52,6 @@ def handle_messages():
 		time.sleep(1)
 
 def main():
-	viklund.JSON_PATH = os.path.abspath(os.path.dirname(sys.argv[0]))
 	args = viklund.Vk_system.handle_args();
 	viklund.vk = viklund.Vk_system.vk_auth(args)
 	viklund.vkApi = viklund.vk.get_api()
