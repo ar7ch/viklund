@@ -1,5 +1,5 @@
 {
-	"default": [
+	"import": [
     	{
     		"call_command":"природа",
     		"group_id": -63784266,

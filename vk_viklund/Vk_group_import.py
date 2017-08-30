@@ -72,23 +72,23 @@ class Vk_group_import:
 			if received_str[i].isalpha() or received_str[i].isdigit():
 				request_str += received_str[i]
 		return request_str
-	def get_import_list(self, item, json_data, filename):
+	def get_import_list(self, item, json_data):
 		commands = ''
-		for items in json_data[filename]:
+		for items in json_data['import']:
 			commands += items['call_command'] + '\n'
 		viklund.Vk_messages.send_selective(item, 'msg', 'Использование: \'/пост <команда>\'\nДоступные команды:\n' + commands)
 
 	@staticmethod
-	def handle_import_request(item, received_str, pathname):
+	def handle_import_request(item, received_str, path_to_file):
 		group_import = viklund.Vk_group_import()
 		request = group_import.get_request_str(received_str)
 		if viklund.Vk_messages.check_if_chat(item):
 			chat_id = item[u'chat_id']
 		try:
-			json_data = group_import.read_json('default', pathname)
-			search_result = group_import.search_json(json_data, request, 'default')
+			json_data = group_import.read_json(path_to_file)
+			search_result = group_import.search_json(json_data, request)
 			if request == '':
-				group_import.get_import_list(item, json_data, 'default');
+				group_import.get_import_list(item, json_data);
 				return 0
 			if not search_result:
 				raise Import_command_not_found_exception()
@@ -98,15 +98,15 @@ class Vk_group_import:
 		else:
 			group_import.select_and_send_random_group_thing(group_import.get_group_id(), item, group_import.get_import_type()) 
 	
-	def read_json(self, filename, path):
-		with open(path + '/' + filename + '.json') as json_file:
+	def read_json(self, path_to_file):
+		with open(path_to_file) as json_file:
 			json_data = json.load(json_file)
 		return json_data
-	def search_json(self, json_data, request_str, filename):
+	def search_json(self, json_data, request_str):
 		found = 0
 		group_id = None
 		import_type = None
-		for items in json_data[filename]:
+		for items in json_data['import']:
 			#str = 
 			if request_str == items['call_command'] or request_str.find(items['call_command']) != -1:
 				found = 1

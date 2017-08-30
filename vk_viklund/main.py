@@ -18,25 +18,23 @@ import time
 import os, sys
 from datetime import datetime
 
-
-JSON_PATH = os.path.abspath(os.path.dirname(sys.argv[0])) 
 def handle_messages():
 	values = {'out': 0,'count': 100,'time_offset': 60}
 	while True:
-		response = viklund.vk.method('messages.get', values)
-		if response['items']:
-			values['last_message_id'] = response['items'][0]['id']
-		for item in response['items']:
-			#your user messages handling code starts here
-			received_str = item[u'body'].lower()
-			try:
+		try:
+			response = viklund.vk.method('messages.get', values)
+			if response['items']:
+				values['last_message_id'] = response['items'][0]['id']
+			for item in response['items']:
+				#your user messages handling code starts here
+				received_str = item[u'body'].lower()
 				#handle messages that only begin with slash
 				if len(received_str) > 1 and received_str[0] == '/':
 					viklund.Vk_system.log_messages(item, received_str)
 					if received_str.find(u'рандом') != -1:
 						viklund.Vk_random.handle_random(item, received_str)
 					elif received_str.find(u'пост') != -1:
-						viklund.Vk_group_import.handle_import_request(item, received_str, JSON_PATH)
+						viklund.Vk_group_import.handle_import_request(item, received_str, viklund.JSON_PATH)
 					elif received_str.find(u'перешли') != -1:
 						viklund.Vk_messages.resend_user_message(item, received_str)
 					elif received_str.find(u'айди') != -1:
@@ -48,12 +46,13 @@ def handle_messages():
 						viklund.Vk_messages.send_selective(item, 'msg', 'Viklund v.0.4\nСтатус: up\nВремя на сервере: ' + datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
 					else:
 						viklund.Vk_messages.send_selective(item, 'msg', received_str[1:] + ': команда не найдена')
-					received_str = u''
-			except Exception as e:
-				viklund.Vk_system.echo_log(e, output_mode='warning')
+				received_str = u''
+		except Exception as e:
+			viklund.Vk_system.echo_log(str(e), output_mode='warning')
 		time.sleep(1)
 
 def main():
+	viklund.JSON_PATH = os.path.abspath(os.path.dirname(sys.argv[0]))
 	args = viklund.Vk_system.handle_args();
 	viklund.vk = viklund.Vk_system.vk_auth(args)
 	viklund.vkApi = viklund.vk.get_api()

@@ -20,4 +20,5 @@ from Vk_messages import *
 from Vk_system import *
 
 vk = None
-vkApi = None 
+vkApi = None
+JSON_PATH = None

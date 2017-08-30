@@ -84,7 +84,9 @@ class Vk_system():
 		arg_parser.add_argument ('-g', '--log', choices=['file', 'stdout',], default='file', type=str, action='store', help='select log type') #select logs output type
 		arg_parser.add_argument('-l', '--login', nargs='?', type=str, action='store', help='input login, UNSAFE, USE CAREFULLY') #
 		arg_parser.add_argument('-p', '--password', nargs='?', type=str, action='store', help='input password, UNSAFE, USE CAREFULLY')
+		arg_parser.add_argument('-j', '--json_path', nargs='?', type=str, action='store', help='Path to .json file, needed for group post import, example: /path/to/file.json')
 		args_namespace = arg_parser.parse_args(sys.argv[1:])
+		viklund.JSON_PATH = args_namespace.json_path
 		log_file = None
 		return args_namespace
 	@staticmethod	
