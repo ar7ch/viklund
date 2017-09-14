@@ -41,6 +41,8 @@ def handle_messages():
 					viklund.Vk_messages.resend_user_message(item, received_str)
 				elif received_str.find(u'айди') != -1:
 					viklund.Vk_messages.handle_id_request(item)
+				elif received_str.find(u'вики') != -1:
+					viklund.Vk_messages.handle_wiki_search_request(item, received_str)
 				elif received_str.find(u'помощь') != -1:
 					viklund.Vk_messages.send_selective(item, 'msg', 'Viklund Bot\nИспользование: \'/команда\'\nДоступные команды:\nпост\nрандом\nперешли\nайди\nпомощь')
 				#hidden feature

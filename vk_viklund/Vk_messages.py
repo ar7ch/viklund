@@ -21,8 +21,22 @@ import os
 import sys
 import getpass
 import viklund
+import wikipedia
 
 class Vk_messages:
+	@staticmethod
+	def handle_wiki_search_request(item, received_str):
+		search_request = received_str[5:] # skip /вики characters
+		wikipedia.set_lang("ru")
+		try:
+			search_result = wikipedia.summary(search_request)
+			viklund.Vk_messages.send_selective(item, 'msg', search_result)
+		except wikipedia.PageError as ex:
+			viklund.Vk_messages.send_selective(item, 'msg', search_request + ': страница не найдена')
+			return -1
+		except:
+			viklund.Vk_messages.send_selective(item, 'msg', 'Произошла ошибка во время поиска')
+
 	@staticmethod
 	def handle_id_request(item):
 		user = viklund.vkApi.users.get(user_ids=item[u'user_id'])
