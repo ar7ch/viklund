@@ -79,7 +79,8 @@ class Vk_group_import:
 		viklund.Vk_messages.send_selective(item, 'msg', 'Использование: \'/пост <команда>\'\nДоступные команды:\n' + commands)
 
 	@staticmethod
-	def handle_import_request(item, received_str, path_to_file):
+	def handle_import_request(item, received_str):
+		path_to_file = viklund.JSON_PATH
 		group_import = viklund.Vk_group_import()
 		request = group_import.get_request_str(received_str)
 		if viklund.Vk_messages.check_if_chat(item):
