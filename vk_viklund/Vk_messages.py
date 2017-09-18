@@ -33,7 +33,10 @@ class Vk_messages:
 			viklund.Vk_messages.send_selective(item, 'msg', search_result)
 		except wikipedia.PageError as ex:
 			viklund.Vk_messages.send_selective(item, 'msg', search_request + ': страница не найдена')
+			viklund.Vk_system.echo_log(str(ex), output_mode='warning')
 			return -1
+		except wikipedia.UserWarning as warning:
+			viklund.Vk_system.echo_log(str(warning), output_mode='warning')
 		except:
 			viklund.Vk_messages.send_selective(item, 'msg', 'Произошла ошибка во время поиска')
 
