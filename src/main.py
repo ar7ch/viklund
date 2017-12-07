@@ -1,4 +1,4 @@
- #This file is part of viklund.
+#This file is part of viklund.
 #
 #Viklund is free software: you can redistribute it and/or modify
 #it under the terms of the GNU General Public License as published by
@@ -54,9 +54,7 @@ def handle_messages():
 		time.sleep(1)
 
 def main():
-	args = viklund.Vk_system.handle_args();
-	viklund.vk = viklund.Vk_system.vk_auth(args)
-	viklund.vkApi = viklund.vk.get_api()
+	System.setup()
 	handle_messages()
 if __name__ == "__main__":
 	main()

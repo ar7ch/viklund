@@ -13,36 +13,26 @@
 #You should have received a copy of the GNU General Public License
 #along with viklund.  If not, see <http://www.gnu.org/licenses/>.
 
-import time
-import vk_api
+
 import random
-import json
-import os
-import sys
-import getpass
 import viklund
 
-class Vk_random:
+class viklund_random:
 	@staticmethod
 	def handle_random(item, received_str):
 		rand = viklund.Vk_random()
 		rand.set_toggle_random(True)
-		status_code = rand.find_a_b(received_str)
-		if status_code == -1:
-			rand.abort_random(item, 0)
-		elif status_code == 1:
-			rand.set_result(rand.randint_wrapper(rand.get_a(), rand.get_b()))
-			rand.success_random(item)
-	def abort_random(self, item, flag):
-		self.set_toggle_random(False)
-		if flag == 0:
+		try:
+			status_code = rand.parse_numbers(received_str)
+			if status_code == -1:
+				raise
+		except:
 			viklund.Vk_messages.send_selective(item, 'msg', u'Что-то пошло не так. Убедитесь, что вы ввели оба числа.')
+			return -1
 		else:
-			viklund.Vk_messages.send_selective(item, 'msg', u'Рандом: отменено')
-	def success_random(self, item):
-		self.set_toggle_random(False)
-		viklund.Vk_messages.send_selective(item, 'msg', u'Успешно! Ваше случайное число в диапазоне от ' + str(min(self.get_a(), self.get_b())) + u' до ' + str(max(self.get_a(), self.get_b())) + u': ' + str(self.get_result()))
-	def find_a_b(self, received_str):
+			rand.set_result(rand.get_random_number(rand.get_a(), rand.get_b()))
+			viklund.Vk_messages.send_selective(item, 'msg', u'Успешно! Ваше случайное число в диапазоне от ' + str(min(self.get_a(), self.get_b())) + u' до ' + str(max(self.get_a(), self.get_b())) + u': ' + str(self.get_result()))
+	def parse_numbers(self, received_str):
 		self.set_a('')
 		self.set_b('') 
 		counter = 0
@@ -74,9 +64,10 @@ class Vk_random:
 					got_b_flag = True
 					self.set_a(int(self.get_a))
 					self.set_b(int(self.get_b))
-		return 1
+					return 1
+		return -1
 
-	def randint_wrapper(self, a, b):
+	def get_random_number(self, a, b):
 		a = int(a)
 		b = int(b)
 		return random.randint(min(a,b), max(a,b))
@@ -88,17 +79,7 @@ class Vk_random:
 		self.b = value
 	def get_b(self):
 		return self.b
-	def set_result(self, value):
-		self.result = value
-	def get_result(self):
-		return self.result
-	def set_toggle_random(self, value):
-		self.toggle_random = value
-	def get_toggle_random(self):
-		return self.toggle_random
 	def __init__(self):
 		pass
 	a = None
 	b = None
-	toggle_random = None
-	result = None
