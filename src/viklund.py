@@ -1,3 +1,4 @@
+#Copyright (R) 
 #This file is part of viklund.
 #
 #Viklund is free software: you can redistribute it and/or modify
@@ -12,12 +13,13 @@
 #
 #You should have received a copy of the GNU General Public License
 #along with viklund.  If not, see <http://www.gnu.org/licenses/>.
-
+from __future__ import absolute_import
 from Vk_random import *
 from Vk_exceptions import *
 from Vk_group_import import *
 from Vk_messages import *
-from Vk_system import *
+from .system import System
+from .logging import Logging
 
 vk = None
 vkApi = None
