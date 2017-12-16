@@ -42,7 +42,16 @@ class Logging():
 
     @staticmethod
     def initialize_logs():
-    	"""create directory for logging file and logging file (or check if it exists) and return opened file object"""
+    	"""
+    	Initialize log folder and log file.
+
+    	Create directory for logging file and logging file (or check if it exists) and return opened file object
+
+		Returns
+   		-------
+    	file
+        	Opened log file object
+    	"""
     	dir_name = 'viklund-logs'
 		file_name = 'viklund.log'
 		dir_path = os.path.join(os.path.abspath(os.path.dirname(sys.argv[0])), dir_name) #get abs path to logging directory

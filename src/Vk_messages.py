@@ -46,14 +46,45 @@ class Message:
 			Message.send_selective(item, 'msg', u'Произошла ошибка!')
 			return -1
 	@staticmethod
+	def parse_attachments(item):
+		"""
+		Parse attachments from response string.
+
+		Parse arguments from response item string and return a list of attachment strings.
+		
+		Parameters
+		----------
+		item 
+			Item section of response string.
+
+		Returns
+		-------
+		list
+			List of attachment strings.
+		"""
+		attachments = []
+		if item['text']: #if string is not empty
+			attachments.append(item['text'])
+		for attachment in item['attachments']:
+			#attachment syntax is <type><owner_id>_<media_id>
+			att_string = ''
+			att_type = attachment['type']
+			att_owner_id = attachment[att_type]['owner_id']
+			att_media_id = attachment[att_type]['media_id']
+			att_access_key = ''
+			if u'access_key' in attachment[att_type]:
+				att_access_key = '_' + attachment[att_type][access_key]
+			att_string = att_type + att_owner_id + '_' + att_media_id + access_key
+			attachments.append(att_string)
+	@staticmethod
 	def is_chat(item):
 		if u'chat_id' in item and item[u'chat_id'] != u'':
 			return True
 		else:
 			return False
 	@staticmethod
-	def send(item, send_item):
-		;
+	def send(item, attachments):
+		
 	@staticmethod
 	def send_pic(user_id, pic_id):
 		viklund.vk.method('messages.send', {'user_id':user_id, 'attachment':pic_id})

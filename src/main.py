@@ -50,7 +50,7 @@ def handle_messages():
 						viklund.Vk_messages.send_selective(item, 'msg', received_str[1:] + ': команда не найдена')
 					received_str = u''
 		except Exception as e:
-			viklund.Vk_system.echo_log(str(e), output_mode='warning')
+			viklund.Logging.write_log(viklund.Logging.warning(str(e)))
 		time.sleep(1)
 
 def main():
