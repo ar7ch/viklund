@@ -24,6 +24,10 @@ import viklund
 import wikipedia
 
 class Message:
+	#constants to select destination type
+	PRIVATE_MESSAGE = 1
+	CONVERSATION = 0
+
 	@staticmethod
 	def handle_id_request(item):
 		user = viklund.vkApi.users.get(user_ids=item[u'user_id'])
@@ -60,13 +64,14 @@ class Message:
 		Returns
 		-------
 		list
-			List of attachment strings.
+			List of attachment strings. Note that 0th element is reserved for text
 		"""
 		attachments = []
+		attachments[0] = '' #note that 0th element is reserved for text 
 		if item['text']: #if string is not empty
-			attachments.append(item['text'])
+			attachments[0] = item['text']
 		for attachment in item['attachments']:
-			#attachment syntax is <type><owner_id>_<media_id>
+			#attachment syntax is <type><owner_id>_<media_id>_<access_key>
 			att_string = ''
 			att_type = attachment['type']
 			att_owner_id = attachment[att_type]['owner_id']
@@ -76,15 +81,59 @@ class Message:
 				att_access_key = '_' + attachment[att_type][access_key]
 			att_string = att_type + att_owner_id + '_' + att_media_id + access_key
 			attachments.append(att_string)
+		#if not attachments: #check if list is empty
+			#raise exception
+		return attachments
 	@staticmethod
 	def is_chat(item):
+		"""Check if is current request from chat or from private message"""
+
 		if u'chat_id' in item and item[u'chat_id'] != u'':
-			return True
+			return viklund.Message.CONVERSATION
 		else:
-			return False
+			return viklund.Message.PRIVATE_MESSAGE
 	@staticmethod
-	def send(item, attachments):
+	def send_attachments(dest_id, attachments, dest_type):
+		"""
+		Sends list of attachments to user or chat
+
+		Sends list of attachments (with attachment syntax <type><owner_id>_<media_id>_<access_key>) to user or chat
 		
+		Parameters
+		----------
+		dest_id : string 
+			Destination id (chat_id or user_id)
+		attachments : list
+			List of attachments with attachment syntax <type><owner_id>_<media_id>_<access_key> to send (access key is optional)
+			Note that 0th element is reserved for text.
+		dest_type
+			Destination type of current response. Can be either Message.CONVERSATION or Message.PRIVATE_MESSAGE
+		Raises
+		-------
+			ValueError
+				If got invalid dest_type value
+			Exception
+
+		"""
+		"""Messages.send() vk_api method excepts list of attachments to send as string where attachments are separated with comma""" 
+		
+		try:
+			if dest_type != Message.PRIVATE_MESSAGE or dest_type != Message.CONVERSATION:
+				raise ValueError("Invalid dest_type value")
+		attachment_str = ','.join(attachments[1:]) #separate attachments list with comma starting with second element (first one is reserved for text)
+		message_str = None
+		if not attachments[0]: #if there is no text
+			message_str = ' '	
+		try:
+			if dest_type == Message.PRIVATE_MESSAGE:
+				viklund.vk.method('messages.send', {'user_id':dest_id, 'message':message_str, 'attachment':attachment_str})
+			elif dest_type == Message.CONVERSATION:
+				viklund.vk.method('messages.send', {'chat_id':dest_id, 'message':message_str, 'attachment':attachment_str})
+		except vk_api.VkApiError:
+			raise
+		except vk_api.ApiError:
+			raise
+
 	@staticmethod
 	def send_pic(user_id, pic_id):
 		viklund.vk.method('messages.send', {'user_id':user_id, 'attachment':pic_id})
