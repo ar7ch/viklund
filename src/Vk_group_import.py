@@ -1,17 +1,19 @@
-#This file is part of viklund.
-#
-#Viklund is free software: you can redistribute it and/or modify
-#it under the terms of the GNU General Public License as published by
-#the Free Software Foundation, either version 3 of the License, or
-#(at your option) any later version.
-#
-#Viklund is distributed in the hope that it will be useful,
-#but WITHOUT ANY WARRANTY; without even the implied warranty of
-#MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#GNU General Public License for more details.
-#
-#You should have received a copy of the GNU General Public License
-#along with viklund.  If not, see <http://www.gnu.org/licenses/>.
+"""
+Copyright (C) 2017-2018 Artyom Bulgakov
+
+This file is part of viklund.
+Viklund is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+Viklund is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with viklund.  If not, see <http://www.gnu.org/licenses/>.
+"""
 
 import time
 import vk_api
@@ -83,7 +85,7 @@ class Vk_group_import:
 		path_to_file = viklund.JSON_PATH
 		group_import = viklund.Vk_group_import()
 		request = group_import.get_request_str(received_str)
-		if viklund.Vk_messages.check_if_chat(item):
+		if viklund.Vk_messages.get_dest_type(item):
 			chat_id = item[u'chat_id']
 		try:
 			json_data = group_import.read_json(path_to_file)

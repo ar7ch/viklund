@@ -15,13 +15,8 @@ You should have received a copy of the GNU General Public License
 along with viklund.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-from __future__ import absolute_import
-from .exceptions import *
-from Vk_group_import import *
-from .message import Message
-from .system import System
-from .logging import Logging
+import viklund
 
-vk = None
-vkApi = None
-JSON_PATH = None
+class Import_command_not_found_exception(Exception):
+	def __init__(self):
+		pass
