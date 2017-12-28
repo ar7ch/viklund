@@ -95,21 +95,22 @@ class Message:
 		else:
 			return viklund.Message.PRIVATE_MESSAGE
 	@staticmethod
-	def send_attachments(dest_id, attachments, dest_type):
+	def send(dest_id, dest_type, message_text = '', attachments = ''):
 		"""
-		Sends list of attachments to user or chat
+		Send message to user or conversation
 
-		Sends list of attachments (with attachment syntax <type><owner_id>_<media_id>_<access_key>) to user or chat
+		Send message to user of conversation. Attachments are expected as list of attachment strings 
+		with attachment syntax <type><owner_id>_<media_id>_<access_key> (access_key is optional)
 		
 		Parameters
 		----------
 		dest_id : string 
 			Destination id (chat_id or user_id)
-		attachments : list
-			List of attachments with attachment syntax <type><owner_id>_<media_id>_<access_key> to send (access key is optional)
-			Note that 0th element is reserved for text.
 		dest_type
 			Destination type of current response. Can be either Message.CONVERSATION or Message.PRIVATE_MESSAGE
+		attachments : string list
+			List of attachments with attachment syntax <type><owner_id>_<media_id>_<access_key> to send (access key is optional)
+		message_text
 		Raises
 		-------
 			ValueError
@@ -122,35 +123,13 @@ class Message:
 		try:
 			if dest_type != Message.PRIVATE_MESSAGE or dest_type != Message.CONVERSATION:
 				raise ValueError("Invalid dest_type value")
-		attachment_str = ','.join(attachments[1:]) #separate attachments list with comma starting with second element (first one is reserved for text)
-		message_str = None
-		if not attachments[0]: #if there is no text
-			message_str = ' '	
+		attachment_str = ','.join(attachments) #separate attachments list with commas	
 		try:
 			if dest_type == Message.PRIVATE_MESSAGE:
-				viklund.vk.method('messages.send', {'user_id':dest_id, 'message':message_str, 'attachment':attachment_str})
+				viklund.vk.method('messages.send', {'user_id':dest_id, 'message':message_text, 'attachment':attachment_str})
 			elif dest_type == Message.CONVERSATION:
-				viklund.vk.method('messages.send', {'chat_id':dest_id, 'message':message_str, 'attachment':attachment_str})
+				viklund.vk.method('messages.send', {'chat_id':dest_id, 'message':message_text, 'attachment':attachment_str})
 		except vk_api.VkApiError:
 			raise
 		except vk_api.ApiError:
 			raise
-
-	@staticmethod
-	def send_pic(user_id, pic_id):
-		viklund.vk.method('messages.send', {'user_id':user_id, 'attachment':pic_id})
-	@staticmethod
-	def send_pic_chat(chat_id, pic_id):
-		viklund.vk.method('messages.send', {'chat_id':chat_id, 'attachment':pic_id})
-	@staticmethod
-	def send_wall_post(user_id, post):
-		viklund.vk.method('messages.send', {'user_id':user_id, 'attachment':post})
-	@staticmethod
-	def send_wall_post_chat(chat_id, post):
-		viklund.vk.method('messages.send', {'chat_id':chat_id, 'attachment':post})
-	@staticmethod
-	def write_msg(user_id, s):
-	    viklund.vk.method('messages.send', {'user_id':user_id,'message':s})
-	@staticmethod
-	def write_msg_chat(chat_id, s):
-		viklund.vk.method('messages.send', {'chat_id':chat_id,'message':s})
