@@ -16,7 +16,6 @@ along with viklund.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 import vk_api
-import json
 import os
 import errno
 import sys

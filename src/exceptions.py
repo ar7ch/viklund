@@ -17,6 +17,3 @@ along with viklund.  If not, see <http://www.gnu.org/licenses/>.
 
 import viklund
 
-class Import_command_not_found_exception(Exception):
-	def __init__(self):
-		pass
