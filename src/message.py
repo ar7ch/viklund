@@ -29,13 +29,7 @@ class Message:
 	#constants to select destination type
 	PRIVATE_MESSAGE = 1
 	CONVERSATION = 0
-
-	@staticmethod
-	def handle_id_request(item):
-		user = viklund.vkApi.users.get(user_ids=item[u'user_id'])
-		username = user[0]['first_name'] + ' ' + user[0]['last_name']
-		user = None
-		viklund.Message.send_selective(item, 'msg', username + ': ' + str(item[u'user_id']))
+	"""
 	@staticmethod
 	def resend_user_message(item, received_str): #TODO: send multiply pictures in one message, resend via forwarded messages
 		try:
@@ -51,6 +45,36 @@ class Message:
 			print(e)
 			Message.send_selective(item, 'msg', u'Произошла ошибка!')
 			return -1
+	"""
+	@staticmethod
+	def get_message(values={'out': 0,'count': 100,'time_offset': 60}):
+		"""
+		Get message. Wrapper for VK API's messages.get() method. 
+		<https://vk.com/dev/messages.get>
+
+		Parameters
+		----------
+		value : list 
+			Item section of response string.
+		
+		Raises
+		______
+			vk_api.VkApiError
+				VK API errors.
+			vk_api.ApiError
+				VK API errors.
+		Returns
+		-------
+		list
+			List of attachment strings. Note that 0th element is reserved for text
+		"""
+		try:
+			response = viklund.vk.method('messages.get', values)
+		except vk_api.VkApiError:
+			raise
+		except vk_api.ApiError:
+			raise
+		return response['items']
 	@staticmethod
 	def parse_attachments(item):
 		"""
@@ -115,8 +139,10 @@ class Message:
 		-------
 			ValueError
 				If got invalid dest_type value
-			Exception
-
+			vk_api.VkApiError
+				VK API errors.
+			vk_api.ApiError
+				VK API errors.
 		"""
 		"""Messages.send() vk_api method excepts list of attachments to send as string where attachments are separated with comma""" 
 		
