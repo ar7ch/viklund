@@ -47,7 +47,33 @@ class Message:
 			return -1
 	"""
 	@staticmethod
-	def get_message(values={'out': 0,'count': 100,'time_offset': 60}):
+	def wait_message(values):
+		"""
+		Wait for new event (message) using Long Poll
+
+		Parameters
+		----------
+		value : dict
+			Parameters for message.get()
+		
+		Raises
+		______
+			vk_api.VkApiError
+				VK API errors.
+			vk_api.ApiError
+				VK API errors.
+		Returns
+		-------
+		list
+			List of attachment strings. Note that 0th element is reserved for text
+		"""
+		longpoll = VkLongPoll(vk_session)
+		for event in longpoll.listen():
+			if event.type == VkEventType.MESSAGE_NEW:
+				return True
+		return False
+	@staticmethod
+	def get_message(values):
 		"""
 		Get message. Wrapper for VK API's messages.get() method. 
 		<https://vk.com/dev/messages.get>
@@ -74,6 +100,8 @@ class Message:
 			raise
 		except vk_api.ApiError:
 			raise
+		if response['items']:
+				values['last_message_id'] = response['items'][0]['id'] #remember last message id to prevent handling the same message twice
 		return response['items']
 	@staticmethod
 	def parse_attachments(item):
