@@ -38,7 +38,7 @@ class System():
 		step 6: get api access
 		"""
 		args = viklund.System.handle_args();
-		viklund.vk = viklund.System.auth(args)
+		viklund.vk_session = viklund.System.auth(args)
 		log_file = viklund.Logging.initialize_logs()
 		"""
 		apparently most users may want to launch the bot in the terminal (e.g. ssh) and then close that terminal sessions
@@ -55,7 +55,7 @@ class System():
 		else: #child process code goes here
 			viklund.Vk_system.override_fd()
 			viklund.Logging.write_log(success_message)
-			viklund.vkApi = viklund.vk.get_api()	
+			viklund.vkApi = viklund.vk_session.get_api()	
 	@staticmethod
 	def handle_args():
 		arg_parser = argparse.ArgumentParser()
@@ -73,7 +73,7 @@ class System():
 
 	@staticmethod
 	def auth(args_namespace):
-		vk = None
+		vk_session = None
 		print('Viklund v.0.5')
 		#if user haven't provided login as commandline argument, ask him for login
 		#otherwise, we'll just copy login from namespace variable to local variable
@@ -88,12 +88,12 @@ class System():
 			vk_passwd = args_namespace.password
 		try:
 			#get VK API access
-			vk = vk_api.VkApi(login = vk_login, password = vk_passwd)
-			vk.auth()
+			vk_session = vk_api.VkApi(login = vk_login, password = vk_passwd)
+			vk_session.auth()
 			del vk_login; del vk_passwd; del args_namespace #it might be safer to delete import variables manually
 		except vk_api.AuthError as error_msg:
 			viklund.Logging.write_log(Logging.error('Unable to log in. Please check that you have entered your login and password correctly.'))
 			exit(1)
 		else:
 			viklund.Logging.write_log(Logging.success("Auth successful"))
-		return vk
+		return vk_session
