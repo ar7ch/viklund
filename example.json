@@ -1,0 +1,11 @@
+{
+	"_comment": "Example post import configuration file",
+	"import": [
+	{
+		"_comment": "call_command is command string that user calls, import_id is id of import source (use negative value for groups)",
+		"call_command":"command",
+		"import_id": -42424242
+		
+	}
+	]
+}
