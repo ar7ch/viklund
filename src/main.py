@@ -20,18 +20,38 @@ import time
 import os, sys
 from datetime import datetime
 
-def handle_messages():
+def handle_response(item)
+	"""
+	request_str = item[u'body'].lower()
+		if len(request_str) > 1 and request_str[0] == '/':
+			viklund.Vk_system.log_messages(item, received_str)"""
+			
+def handle_message():
 	values = {'out': 0,'count': 100,'time_offset': 60}
 	while True:
 		try:
-			item = viklund.Message.get_messsage(values)
-			if item:
-				values['last_message_id'] = response['items'][0]['id'] #save last message id to handle it only once
-			received_str = item[u'body'].lower()
-			#handle messages that only begin with slash
-			if len(received_str) > 1 and received_str[0] == '/':
-				viklund.Vk_system.log_messages(item, received_str)
-				"""
+			if viklund.Message.wait_message(values):
+				items = viklund.Message.get_message(values)
+			for item in items:
+				handle_response(item)
+		except Exception as e:
+			viklund.Logging.write_log(viklund.Logging.warning(str(e)))
+		time.sleep(1)
+
+def main():
+	viklund.System.setup()
+	viklund.handle_messages()
+if __name__ == "__main__":
+	main()
+
+
+
+
+
+
+
+
+	"""
 				if received_str.find(u'рандом') != -1:
 					viklund.Vk_random.handle_random(item, received_str)
 				elif received_str.find(u'пост') != -1:
@@ -50,12 +70,3 @@ def handle_messages():
 					viklund.Vk_messages.send_selective(item, 'msg', received_str[1:] + ': команда не найдена')
 					received_str = u''
 				"""
-		except Exception as e:
-			viklund.Logging.write_log(viklund.Logging.warning(str(e)))
-		time.sleep(1)
-
-def main():
-	viklund.System.setup()
-	viklund.handle_messages()
-if __name__ == "__main__":
-	main()
