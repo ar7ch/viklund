@@ -56,6 +56,6 @@ def handle_messages():
 
 def main():
 	viklund.System.setup()
-	handle_messages()
+	viklund.handle_messages()
 if __name__ == "__main__":
 	main()

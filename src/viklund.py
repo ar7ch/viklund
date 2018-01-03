@@ -17,11 +17,11 @@ along with viklund.  If not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import absolute_import
 from .exceptions import *
-from Vk_group_import import *
+from .post_import import *
 from .message import Message
 from .system import System
 from .logging import Logging
-
+from .json_parser import PostImport
 vk = None
 vkApi = None
 JSON_PATH = None

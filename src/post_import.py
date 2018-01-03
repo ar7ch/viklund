@@ -59,24 +59,6 @@ class PostImport:
 			raise
 		return response
 
-
-
-
-	def get_request_str(received_str):
-		start_index = received_str.find('пост')
-		start_index += 4
-		request_str = ''
-		for i in range(start_index, len(received_str)):
-			if received_str[i].isalpha() or received_str[i].isdigit():
-				request_str += received_str[i]
-		return request_str
-
-	@staticmethod
-	def get_import_list(json_data):
-		commands = None
-		for items in json_data['import']:
-			commands += items['call_command'] + '\n'
-		return 'Использование: \'/пост <команда>\'\nДоступные команды:\n' + commands
 	"""
 	@staticmethod
 	def handle_import_request(item, received_str):
@@ -99,20 +81,3 @@ class PostImport:
 		else:
 			group_import.select_and_send_random_group_thing(group_import.get_group_id(), item, group_import.get_import_type()) 
 	"""
-	def read_json(self, path_to_file):
-		with open(path_to_file) as json_file:
-			json_data = json.load(json_file)
-		return json_data
-
-	def search_json(json_data, request_str):
-		found = 0
-		group_id = None
-		import_type = None
-		for items in json_data['import']:
-			#str = 
-			if request_str == items['call_command'] or request_str.find(items['call_command']) != -1:
-				found = 1
-				group_id = items['group_id']
-				self.group_id = group_id
-				break
-		return 1 if found == 1 else 0
