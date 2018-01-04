@@ -22,6 +22,7 @@ from .message import Message
 from .system import System
 from .logging import Logging
 from .json_parser import PostImport
+from .handle_response import *
 vk_session = None
 vkApi = None
 JSON_PATH = None
