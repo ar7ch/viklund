@@ -29,43 +29,53 @@ class Message:
 	#constants to select destination type
 	PRIVATE_MESSAGE = 1
 	CONVERSATION = 0
-	"""
+
+
 	@staticmethod
-	def resend_user_message(item, received_str): #TODO: send multiply pictures in one message, resend via forwarded messages
-		try:
-			for picture in item['attachments']:
-				access_key = ''
-				try:
-					access_key = '_' + str(picture['photo']['access_key'])
-				except:
-					access_key = ''
-				pic = u'photo' + str(picture['photo']['owner_id']) + '_' + str(picture['photo']['id']) + access_key
-				viklund.Message.send_selective(item, 'pic', pic)
+	def handle_message():
+		"""
+		Primary messages handling function.
+		Wait for message, get, fork if available and pass to handle_response.
+
+		Raises
+		______
+			Exception
+				Exceptions ocurred.
+		"""
+		values = {'out': 0,'count': 100,'time_offset': 60}
+		fork_count = 0
+		FORK_LIMIT = 5
+		while True:
+			try:
+				if viklund.Message.wait_message(values):
+					items = viklund.Message.get_message(values)
+
+				for item in items:
+					if item[u'body'] and item[0] == '/':
+						viklund.Vk_system.log_messages(item, received_str)
+						# fork process for handle_response() execution if available 
+						if fork_count <= FORK_LIMIT:
+							fork_count += 1
+							pid = os.fork()
+							if pid == 0: # if in child process
+								handle_response(item)
+								exit(0) # child process must be closed after the work is done
+						else:
+							#else call function in the same process
+							handle_response(item)
+
 		except Exception as e:
-			print(e)
-			Message.send_selective(item, 'msg', u'Произошла ошибка!')
-			return -1
-	"""
+			viklund.Logging.write_log(viklund.Logging.warning(str(e)))
+
 	@staticmethod
-	def wait_message(values):
+	def wait_message():
 		"""
 		Wait for new event (message) using Long Poll
 
-		Parameters
-		----------
-		value : dict
-			Parameters for message.get()
-		
-		Raises
-		______
-			vk_api.VkApiError
-				VK API errors.
-			vk_api.ApiError
-				VK API errors.
 		Returns
 		-------
-		list
-			List of attachment strings. Note that 0th element is reserved for text
+		: bool
+			True if got new message event, false if error occured.
 		"""
 		longpoll = VkLongPoll(vk_session)
 		for event in longpoll.listen():
@@ -80,7 +90,7 @@ class Message:
 
 		Parameters
 		----------
-		value : list 
+		values : dict 
 			Item section of response string.
 		
 		Raises
@@ -91,8 +101,8 @@ class Message:
 				VK API errors.
 		Returns
 		-------
-		list
-			List of attachment strings. Note that 0th element is reserved for text
+		items : dict
+			Dictionary of message items.		
 		"""
 		try:
 			response = viklund.vk.method('messages.get', values)
@@ -101,7 +111,7 @@ class Message:
 		except vk_api.ApiError:
 			raise
 		if response['items']:
-				values['last_message_id'] = response['items'][0]['id'] #remember last message id to prevent handling the same message twice
+				values['last_message_id'] = response['items'][0]['id'] #save last message id to prevent handling the same message twice
 		return response['items']
 	@staticmethod
 	def parse_attachments(item):
@@ -187,3 +197,29 @@ class Message:
 			raise
 		except vk_api.ApiError:
 			raise
+
+
+
+
+
+
+
+
+
+				"""
+	@staticmethod
+	def resend_user_message(item, received_str): #TODO: send multiply pictures in one message, resend via forwarded messages
+		try:
+			for picture in item['attachments']:
+				access_key = ''
+				try:
+					access_key = '_' + str(picture['photo']['access_key'])
+				except:
+					access_key = ''
+				pic = u'photo' + str(picture['photo']['owner_id']) + '_' + str(picture['photo']['id']) + access_key
+				viklund.Message.send_selective(item, 'pic', pic)
+		except Exception as e:
+			print(e)
+			Message.send_selective(item, 'msg', u'Произошла ошибка!')
+			return -1
+	"""

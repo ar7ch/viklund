@@ -20,23 +20,8 @@ import time
 import os, sys
 from datetime import datetime
 
-def handle_response(item)
-	"""
-	request_str = item[u'body'].lower()
-		if len(request_str) > 1 and request_str[0] == '/':
-			viklund.Vk_system.log_messages(item, received_str)"""
-			
-def handle_message():
-	values = {'out': 0,'count': 100,'time_offset': 60}
-	while True:
-		try:
-			if viklund.Message.wait_message(values):
-				items = viklund.Message.get_message(values)
-			for item in items:
-				handle_response(item)
-		except Exception as e:
-			viklund.Logging.write_log(viklund.Logging.warning(str(e)))
-		time.sleep(1)
+def handle_response(item):
+	
 
 def main():
 	viklund.System.setup()
