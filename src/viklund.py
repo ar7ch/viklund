@@ -19,6 +19,8 @@ from core import *
 from front import *
 from extra import *
 
+dest_type = None
+dest_id = None
 vk_session = None
 vkApi = None
 JSON_PATH = None

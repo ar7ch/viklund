@@ -20,7 +20,6 @@ from vk_api.longpoll import VkLongPoll, VkEventType
 import os
 import sys
 import viklund
-import wikipedia
 import time
 
 class Message:
@@ -28,6 +27,11 @@ class Message:
 	PRIVATE_MESSAGE = 1
 	CONVERSATION = 0
 
+	@staticmethod
+	def setup_dest(item):
+		viklund.dest_type = viklund.Message.get_dest_type(item)
+		viklund.dest_id = viklund.Message.get_dest_id(item)
+	
 	@staticmethod
 	def get_dest_id(item):
 		dest_type = viklund.Message.get_dest_type(item)
@@ -50,7 +54,7 @@ class Message:
 		fork_count = 0
 		FORK_LIMIT = 5
 		while True:
-			try:
+			if fork_count == 0:#try:
 				if viklund.Message.wait_message():
 					print('Got message event')
 					response = viklund.Message.get_message(values)
@@ -73,8 +77,8 @@ class Message:
 								#else call function in the same process
 							viklund.handle_response(item)
 							del item
-			except Exception as e:
-				viklund.Logging.write_log(viklund.Logging.warning(e))
+			#except Exception as e:
+			#	viklund.Logging.write_log(viklund.Logging.warning(e))
 			time.sleep(1)
 
 	@staticmethod
@@ -163,7 +167,7 @@ class Message:
 		else:
 			return viklund.Message.PRIVATE_MESSAGE
 	@staticmethod
-	def send(dest_id, dest_type, message_text = '', attachments = ''):
+	def send(send_dest_id=None, send_dest_type=None, message_text = '', attachments = ''):
 		"""
 		Send message to user or conversation
 
@@ -190,17 +194,22 @@ class Message:
 		"""
 		"""Messages.send() vk_api method excepts list of attachments to send as string where attachments are separated with comma""" 
 		
+		if not send_dest_id: #python gives attribute_error if viklund.dest_id is default value of send_dest_id argument, no idea why
+			send_dest_id = viklund.dest_id
+		if not send_dest_type:
+			send_dest_type = viklund.dest_type
+		
 		try:
-			if dest_type != Message.PRIVATE_MESSAGE and dest_type != Message.CONVERSATION:
+			if send_dest_type != Message.PRIVATE_MESSAGE and send_dest_type != Message.CONVERSATION:
 				raise ValueError("Invalid dest_type value")
 		except ValueError:
 			raise
 		attachment_str = ','.join(attachments) #separate attachments list with commas	
 		try:
-			if dest_type == Message.PRIVATE_MESSAGE:
-				viklund.vk_session.method('messages.send', {'user_id':dest_id, 'message':message_text, 'attachment':attachment_str})
-			elif dest_type == Message.CONVERSATION:	
-				viklund.vk_session.method('messages.send', {'chat_id':dest_id, 'message':message_text, 'attachment':attachment_str})
+			if send_dest_type == Message.PRIVATE_MESSAGE:
+				viklund.vk_session.method('messages.send', {'user_id':send_dest_id, 'message':message_text, 'attachment':attachment_str})
+			elif send_dest_type == Message.CONVERSATION:	
+				viklund.vk_session.method('messages.send', {'chat_id':send_dest_id, 'message':message_text, 'attachment':attachment_str})
 		except vk_api.VkApiError:
 			raise
 		except vk_api.ApiError:
