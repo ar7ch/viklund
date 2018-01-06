@@ -27,3 +27,4 @@ dest_id = None
 vk_session = None
 vkApi = None
 JSON_PATH = None
+LOGS_PATH = None

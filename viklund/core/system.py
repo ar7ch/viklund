@@ -73,12 +73,14 @@ class System():
 		arg_parser.add_argument('-l', '--login', nargs='?', type=str, action='store', help='input login, UNSAFE, USE CAREFULLY') #
 		arg_parser.add_argument('-p', '--password', nargs='?', type=str, action='store', help='input password, UNSAFE, USE CAREFULLY')
 		arg_parser.add_argument('-j', '--json_path', nargs='?', type=str, action='store', help='Path to .json file, needed for group post import, example: /path/to/file.json')
+		arg_parser.add_argument('-g', '--log_path', nargs='?', type=str, action='store', help='Path where logs directory should be created')
 		args_namespace = arg_parser.parse_args(sys.argv[1:])
 		if args_namespace.json_path:
 			viklund.JSON_PATH = args_namespace.json_path
 		else:
 			viklund.JSON_PATH = os.path.abspath(os.path.dirname(sys.argv[0])) + '/default.json'
-		log_file = None
+		if args_namespace.log_path:
+			viklund.LOGS_PATH = args_namespace.log_path
 		return args_namespace
 
 	@staticmethod

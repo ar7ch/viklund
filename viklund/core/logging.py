@@ -64,7 +64,14 @@ class Logging():
 		"""
 		dir_name = 'viklund-logs'
 		file_name = 'viklund.log'
-		dir_path = os.path.join(os.path.abspath(os.path.dirname(sys.argv[0])), dir_name) #get abs path to logging directory
+		if not viklund.LOGS_PATH:
+			dir_path = os.path.join(os.path.abspath(os.path.dirname(sys.argv[0])), dir_name) #get abs path to logging directory
+		else:
+			if os.path.exists(viklund.LOGS_PATH):
+				dir_path = os.path.join(viklund.LOGS_PATH, dir_name)
+			else:
+				print(viklund.Logging.error("specified log folder path does not exist. Try again passing correct path.\n"))
+				exit(1)
 		try:
 			os.mkdir(os.path.abspath(dir_path), 0o777)
 		except OSError as e:
