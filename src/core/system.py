@@ -47,15 +47,16 @@ class System():
 		even if user closes terminal, the server process will be alive
 		"""
 		pid = os.fork()
-		success_message = viklund.Logging.success('Bot started with PID ' + str(pid))
 		if pid: #parent process code goes here (pid > 0)
 			#parent only shows success message and exits
-			viklund.Logging.write_log(success_message)
+			success_message = viklund.Logging.success('Bot started with PID ' + str(pid))
+			viklund.Logging.write_log(success_message) #output to terminal
+			viklund.Logging.override_fd(log_file)
+			viklund.Logging.write_log(success_message) #output to log file
 			exit(0)
 		else: #child process code goes here
+			viklund.vkApi = viklund.vk_session.get_api()
 			viklund.Logging.override_fd(log_file)
-			viklund.Logging.write_log(success_message)
-			viklund.vkApi = viklund.vk_session.get_api()	
 	@staticmethod
 	def handle_args():
 		arg_parser = argparse.ArgumentParser()
@@ -74,7 +75,7 @@ class System():
 	@staticmethod
 	def auth(args_namespace):
 		vk_session = None
-		print('Viklund v.0.5')
+		print('Viklund v.0.6')
 		#if user haven't provided login as commandline argument, ask him for login
 		#otherwise, we'll just copy login from namespace variable to local variable
 		if not args_namespace.login: 
