@@ -1,3 +1,6 @@
+#/usr/bin/python3
+# -*- coding: UTF-8 -*-
+
 """
 Copyright (C) 2017-2018 Artyom Bulgakov
 
