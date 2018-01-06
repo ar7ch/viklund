@@ -1,1 +1,1 @@
-from .search_wiki import *
+from .extra import *
