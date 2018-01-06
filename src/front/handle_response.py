@@ -21,7 +21,7 @@ import time
 import os, sys
 from datetime import datetime
 import random
-import urllib.request
+
 def handle_post_request(arguments, request, item, post_values = {'owner_id':None, 'count':1, 'offset':0}):
 	# step 0: configure sending options
 	# step 1: find if request is in .json config
@@ -33,9 +33,13 @@ def handle_post_request(arguments, request, item, post_values = {'owner_id':None
 		if request in requests:
 			post_values['owner_id'] = requests[request]
 		else:
-			err_string = 'Request not found: {}'.format(request)
-			viklund.Message.send(message_text = '{}\n/post to get available imports, /help for help'.format(err_string))
-			raise KeyError(err_string)
+			not_found_string = 'Request not found: {}\n/help for help message, /post for available imports\n'.format(request)
+			no_request_string = 'Usage: /post (-random) <request>\nAvailable imports: \n{}'.format('\n'.join(requests.keys()))
+			if not request:
+				viklund.Message.send(message_text = no_request_string)
+			else:
+				viklund.Message.send(message_text = not_found_string)
+				raise KeyError(not_found_string)
 			return
 		#TODO: send more than 1 post
 		if '-random' in arguments:
@@ -63,11 +67,13 @@ def parse_request_args(sep):
 			arguments.append(separated)
 	return arguments
 
-def parse_request(sep):
-	request = None
+def parse_request(sep, arguments):
+	request_str = ''
 	for separated in sep[1:]:
-		if separated[0] != '-':
-			return separated
+		if not (separated in arguments):
+			request_str += separated + ' '
+	return request_str.strip()
+
 def handle_info_request(item, request=None):
 	user_id = None
 	if request:
@@ -84,6 +90,13 @@ def handle_info_request(item, request=None):
 	ans_str = '{0} {1}\nID: {2}\nDomain: {3}'.format(first_name, last_name, str(user_id), domain)
 	viklund.Message.send(message_text=ans_str)
 
+def handle_resend_request(item):
+	attachments_list = viklund.Message.parse_attachments(item)
+	if not attachments_list:
+		viklund.Message.send(message_text='Nothing to resend')
+		return -1
+	viklund.Message.send(attachments = attachments_list)
+
 def handle_response(item):
 	"""
 	Setup is done - here goes your bot's response code!
@@ -94,16 +107,36 @@ def handle_response(item):
 	sep = request_str.split() 
 	command = sep[0][1:] # remove slash char
 	arguments = parse_request_args(sep)
-	request = parse_request(sep)
+	request = parse_request(sep, arguments)
 	try:
 		if command == 'post':
 			handle_post_request(arguments, request, item)
-		if command == 'info':
+		elif command == 'wiki':
+			viklund.Extra.handle_wiki_search(request)
+		elif command == 'info':
 			handle_info_request(item, request)
+		elif command == 'resend':
+			handle_resend_request(item)
+		elif command == 'status':
+			status_message = '''
+			Viklund Bot v.0.6
+			Status: working
+			Time on server: {}
+			'''.format(datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
 		elif command == 'help':
-			viklund.Message.send(message_text='Viklund v0.6')
+			help_message = '''
+			Viklund Bot v.0.6\n
+			Commands:
+			/post [-random] <request> - send post from pre-configured list of imports. Sends latest post by default, use -random option to send random post.\n
+			/wiki <request> - search in Wikipedia.\n
+			/resend - resend media attached to message\n
+			/info <id> - show user's name, domain and id. Specify ID to send other user's info.\n    
+			/status - show bot status.\n
+			/help - print this help message and exit.\n
+			'''#/weather <request> - show weather for specified location.\n
+			viklund.Message.send(message_text=help_message)
 		else:
-			viklund.Message.send(message_text = '{}: command not found\n/help for help')
+			viklund.Message.send(message_text = '{}: command not found\n/help for help'.format(command))
 	except Exception as e:
 		raise
 

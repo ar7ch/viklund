@@ -56,9 +56,7 @@ class Message:
 		while True:
 			if fork_count == 0:#try:
 				if viklund.Message.wait_message():
-					print('Got message event')
 					response = viklund.Message.get_message(values)
-					print('Got message')
 				if response:
 					last_message_id = response['items'][0]['id']
 					values['last_message_id'] = last_message_id #save last message id to prevent handling the same message twice
@@ -144,7 +142,6 @@ class Message:
 		"""
 		attachments = []
 		if 'attachments' in item:
-			print('attachments:' + str(item['attachments']))
 			for attachment in item['attachments']:
 				#attachment syntax is <type><owner_id>_<media_id>_<access_key>
 				att_string = ''
@@ -155,7 +152,6 @@ class Message:
 				if u'access_key' in attachment[att_type]:
 					att_access_key = '_' + attachment[att_type]['access_key']
 				att_string = '{0}{1}_{2}{3}'.format(att_type,str(att_owner_id),str(att_media_id),att_access_key)
-				print("Attachment is " + str(att_string))
 				attachments.append(att_string)
 		return attachments
 	@staticmethod
