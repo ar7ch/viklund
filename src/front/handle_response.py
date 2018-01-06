@@ -23,6 +23,27 @@ from datetime import datetime
 import random
 
 def handle_post_request(arguments, request, item, post_values = {'owner_id':None, 'count':1, 'offset':0}):
+	"""
+	Implementation of /post command. 
+
+	Send imported post to user.
+	
+	Parameters
+	-----------
+		arguments : list
+			Arguments parsed.
+		request : string
+			Request string.
+		item
+			Item section of response.
+		post_values  : dict
+			Values to pass to get_message() method.
+	Raises
+	------
+		Exception
+			Exceptions occured.
+	"""
+
 	# step 0: configure sending options
 	# step 1: find if request is in .json config
 	# step 2: get post
@@ -60,6 +81,18 @@ def handle_post_request(arguments, request, item, post_values = {'owner_id':None
 		raise
 
 def parse_request_args(sep):
+	"""
+	Parse args from user's message.
+	
+	Parameters
+	-----------
+		sep : list
+			Whitespace-separated user messages.
+	Returns
+	-------
+		arguments : list
+			List of parsed arguments.
+	"""
 	arguments = []
 	for separated in sep[1:]:
 		#argument syntax is /command -arg1 -arg2 request
@@ -68,6 +101,21 @@ def parse_request_args(sep):
 	return arguments
 
 def parse_request(sep, arguments):
+	"""
+	Parse request from user's message.
+
+	Parameters
+	-----------
+		sep : list
+			Whitespace-separated user message.
+		arguments : list
+			Arguments parsed with parse_request_args().
+	Returns
+	-------
+		request : string
+			Request string.
+
+	"""
 	request_str = ''
 	for separated in sep[1:]:
 		if not (separated in arguments):
@@ -75,6 +123,16 @@ def parse_request(sep, arguments):
 	return request_str.strip()
 
 def handle_info_request(item, request=None):
+	"""
+	Implementation of /info command - get user info. 
+	
+	Parameters
+	-----------
+		item
+			Item section of response.
+		request
+			Custom ID. None by default.
+	"""
 	user_id = None
 	if request:
 		user_id = request
@@ -91,6 +149,14 @@ def handle_info_request(item, request=None):
 	viklund.Message.send(message_text=ans_str)
 
 def handle_resend_request(item):
+	"""
+	Implementation of /resend command - resend user's attachments.
+	
+	Parameters
+	-----------
+		item
+			Item section of response.
+	"""
 	attachments_list = viklund.Message.parse_attachments(item)
 	if not attachments_list:
 		viklund.Message.send(message_text='Nothing to resend')
@@ -139,24 +205,3 @@ def handle_response(item):
 			viklund.Message.send(message_text = '{}: command not found\n/help for help'.format(command))
 	except Exception as e:
 		raise
-
-
-	"""
-	if received_str.find(u'рандом') != -1:
-		viklund.Vk_random.handle_random(item, received_str)
-	elif received_str.find(u'пост') != -1:
-		viklund.Vk_group_import.handle_import_request(item, received_str)
-	elif received_str.find(u'перешли') != -1:
-		viklund.Vk_messages.resend_user_message(item, received_str)
-	elif received_str.find(u'айди') != -1:
-		viklund.Vk_messages.handle_id_request(item)
-	elif received_str.find(u'вики') != -1:
-		viklund.Vk_messages.handle_wiki_search_request(item, received_str)
-	elif received_str.find(u'помощь') != -1:
-		viklund.Vk_messages.send_selective(item, 'msg', 'Viklund Bot\nИспользование: \'/команда\'\nДоступные команды:\nпост\nрандом\nперешли\nайди\nпомощь')
-	elif received_str.find(u'статус') != -1:
-			viklund.Vk_messages.send_selective(item, 'msg', 'Viklund v.0.4\nСтатус: up\nВремя на сервере: ' + datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
-	else:
-		viklund.Vk_messages.send_selective(item, 'msg', received_str[1:] + ': команда не найдена')
-		received_str = u''
-	"""

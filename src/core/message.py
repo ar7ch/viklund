@@ -29,16 +29,42 @@ class Message:
 
 	@staticmethod
 	def setup_dest(item):
+		"""
+		Setup destination id. Wrapper for get_dest_type() and get_dest_id()
+		
+		Parameters
+		----------
+			item
+				Item section of response.
+
+		"""
 		viklund.dest_type = viklund.Message.get_dest_type(item)
 		viklund.dest_id = viklund.Message.get_dest_id(item)
 	
 	@staticmethod
 	def get_dest_id(item):
+		"""
+		Get dest_id - chat_id or user id.
+
+		Parameters
+		----------
+			item
+				Item section of response.
+
+		Returns
+		-------
+			item['user_id']
+				If destination id is user id
+			item['chat_id']
+				If destination id is chat_id
+
+
+		"""
 		dest_type = viklund.Message.get_dest_type(item)
 		if dest_type == viklund.Message.PRIVATE_MESSAGE:
-			return item[u'user_id']
+			return item['user_id']
 		else:
-			return item[u'chat_id']
+			return item['chat_id']
 	@staticmethod
 	def handle_message():
 		"""
@@ -54,7 +80,7 @@ class Message:
 		fork_count = 0
 		FORK_LIMIT = 5
 		while True:
-			if fork_count == 0:#try:
+			try:
 				if viklund.Message.wait_message():
 					response = viklund.Message.get_message(values)
 				if response:
@@ -68,15 +94,15 @@ class Message:
 							#if fork_count <= FORK_LIMIT:
 							#	fork_count += 1
 							#	pid = os.fork()
-							#	if pid == 0: # if in child process
+							#	if not pid: # if in child process
 							#		viklund.handle_response(item)
 							#		exit(0) # child process must be closed after the work is done
 							#else:
 								#else call function in the same process
 							viklund.handle_response(item)
 							del item
-			#except Exception as e:
-			#	viklund.Logging.write_log(viklund.Logging.warning(e))
+			except Exception as e:
+				viklund.Logging.write_log(viklund.Logging.warning(e))
 			time.sleep(1)
 
 	@staticmethod
@@ -113,8 +139,8 @@ class Message:
 				VK API errors.
 		Returns
 		-------
-		items : dict
-			Dictionary of message items.		
+		response
+			Response of messages.get() method.		
 		"""
 		try:
 			response = viklund.vk_session.method('messages.get', values)
@@ -126,14 +152,14 @@ class Message:
 	@staticmethod
 	def parse_attachments(item):
 		"""
-		Parse attachments from response string.
+		Parse attachments from response item.
 
-		Parse arguments from response item string and return a list of attachment strings.
+		Parse attachments from response item and return a list of attachment strings.
 		
 		Parameters
 		----------
 		item 
-			Item section of response string.
+			Item section of response.
 
 		Returns
 		-------
@@ -156,7 +182,20 @@ class Message:
 		return attachments
 	@staticmethod
 	def get_dest_type(item):
-		"""Check if is current request from chat or from private message"""
+		"""
+		Check if is current request from chat or from private message
+
+		Parameters
+		----------
+			item
+				Item section of response.
+		Returns
+		-------
+			viklund.Message.CONVERSATION
+				If current request came from chat.
+			viklund.Message.PRIVATE_MESSAGE
+				If current request came from private messages.
+		"""
 
 		if u'chat_id' in item and item[u'chat_id'] != u'':
 			return viklund.Message.CONVERSATION
@@ -172,13 +211,14 @@ class Message:
 		
 		Parameters
 		----------
-		dest_id : string 
+		send_dest_id : string 
 			Destination id (chat_id or user_id)
-		dest_type
+		send_dest_type
 			Destination type of current response. Can be either Message.CONVERSATION or Message.PRIVATE_MESSAGE
 		attachments : string list
 			List of attachments with attachment syntax <type><owner_id>_<media_id>_<access_key> to send (access key is optional)
-		message_text
+		message_text : string
+			Text to send.
 		Raises
 		-------
 			ValueError
@@ -210,29 +250,3 @@ class Message:
 			raise
 		except vk_api.ApiError:
 			raise
-
-
-
-
-
-
-
-
-
-	"""
-	@staticmethod
-	def resend_user_message(item, received_str): #TODO: send multiply pictures in one message, resend via forwarded messages
-		try:
-			for picture in item['attachments']:
-				access_key = ''
-				try:
-					access_key = '_' + str(picture['photo']['access_key'])
-				except:
-					access_key = ''
-				pic = u'photo' + str(picture['photo']['owner_id']) + '_' + str(picture['photo']['id']) + access_key
-				viklund.Message.send_selective(item, 'pic', pic)
-		except Exception as e:
-			print(e)
-			Message.send_selective(item, 'msg', u'Произошла ошибка!')
-			return -1
-	"""

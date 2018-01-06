@@ -33,9 +33,16 @@ class Logging():
 	UNDERLINE = '\033[4m'
 
 	@staticmethod
-	def override_fd(log_fd):
-		"""override stdout and stderr with opened logging file descriptor log_fd"""
-		file_fd = log_fd.fileno() #get file descriptor number of opened file
+	def override_fd(log_file):
+		"""
+		Override stdout and stderr with opened logging file object log_file
+
+		Parameters
+		----------
+			log_file
+				Opened log file object.
+		"""
+		file_fd = log_file.fileno() #get file descriptor number of opened file
 		dup_fd = os.dup(file_fd) #duplicate opened file for stderr
 		os.dup2(file_fd, sys.stdout.fileno()) #stdout now will be redirected to our log file
 		os.dup2(dup_fd, sys.stderr.fileno()) #stderr now will be redirected to our log file
@@ -73,7 +80,17 @@ class Logging():
 
 	@staticmethod	
 	def log_messages(item):
-		"""get date of recieved message, and return formatted string for logging output"""
+		"""
+		Get date of recieved message, and return formatted string with timedate prefix for logging output
+
+		Parameters
+		----------
+			item
+				Item section of response.
+		Returns
+			output_str : string
+				Formatted string with timedate prefix
+		"""
 		format_type = '%d/%m/%Y %H:%M:%S'
 		date = datetime.fromtimestamp(item['date']).strftime(format_type)
 		output_str = 'Пользователь в ' + date + ' вызвал команду: ' + item['body']
@@ -81,19 +98,68 @@ class Logging():
 
 	@staticmethod
 	def success(success_message):
+		"""
+		Return success_message string with green OK prefix.
+
+		Parameters
+		----------
+			success_message : string
+				Success message.
+		
+		Returns
+		-------
+			: string
+				Success_message string with green OK prefix.
+
+		"""
 		return Logging.BOLD + Logging.OKGREEN + 'OK: ' + Logging.ENDC + str(success_message) + '\n'
 
 	@staticmethod
 	def warning(warning_message):
+		"""
+		Return warning_message string with yellow WARNING prefix.
+
+		Parameters
+		----------
+			warning_message : string
+				Warning message.
+		
+		Returns
+		-------
+			: string
+				warning_message string with yellow WARNING prefix.
+
+		"""
 		return Logging.BOLD + Logging.WARNING + 'WARNING: ' + Logging.ENDC + str(warning_message) + '\n'
 
 	@staticmethod
 	def error(error_message):
+		"""
+		Return error_message string with red ERROR prefix.
+
+		Parameters
+		----------
+			error_message : string
+				Error message.
+		
+		Returns
+		-------
+			: string
+				Error_message string with red ERROR prefix.
+
+		"""
 		return Logging.BOLD + Logging.FAIL + 'ERROR: ' + Logging.ENDC + str(error_message) + '\n'
 
 	@staticmethod
 	def write_log(output_str):
-		"""write string output_str to log file"""
+		"""
+		Write output_str to log file with timedate prefox.
+
+		Parameters
+		----------
+			output_str
+				Formatted string with timedate prefix.
+		"""
 		date_format = '%Y-%m-%d %H:%M:%S'
 		date_now = datetime.now().strftime(date_format)
 		time_now = '[ {} ] '.format(date_now)

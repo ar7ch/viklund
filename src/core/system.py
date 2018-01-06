@@ -16,7 +16,6 @@ along with viklund.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 import vk_api
-import json
 import os
 import errno
 import sys
@@ -44,7 +43,7 @@ class System():
 		apparently most users may want to launch the bot in the terminal (e.g. ssh) and then close that terminal sessions
 		but we don't want our process to be closed
 		so we do auth procedure, clone process with fork() and exit the parent process
-		even if user closes terminal, the server process will be alive
+		even if user closes terminal, the bot process will be alive
 		"""
 		pid = os.fork()
 		if pid: #parent process code goes here (pid > 0)
@@ -59,8 +58,15 @@ class System():
 			viklund.Logging.override_fd(log_file)
 	@staticmethod
 	def handle_args():
+		"""
+		Handle arguments.
+
+		Returns
+		-------
+			args_namespace
+				Arguments namespace.
+		"""
 		arg_parser = argparse.ArgumentParser()
-		arg_parser.add_argument('-g', '--log', choices=['file', 'stdout',], default='file', type=str, action='store', help='select log type') #select logs output type
 		arg_parser.add_argument('-l', '--login', nargs='?', type=str, action='store', help='input login, UNSAFE, USE CAREFULLY') #
 		arg_parser.add_argument('-p', '--password', nargs='?', type=str, action='store', help='input password, UNSAFE, USE CAREFULLY')
 		arg_parser.add_argument('-j', '--json_path', nargs='?', type=str, action='store', help='Path to .json file, needed for group post import, example: /path/to/file.json')
@@ -74,6 +80,18 @@ class System():
 
 	@staticmethod
 	def auth(args_namespace):
+		"""
+		Auth to VK and return active VK session.
+
+		Parameters
+		----------
+			args_namespace
+				Arguments namespace returned by handle_args()
+		Raises
+		------
+			AuthError
+				Authentication error.
+		"""
 		vk_session = None
 		print('Viklund v.0.6')
 		#if user haven't provided login as commandline argument, ask him for login
