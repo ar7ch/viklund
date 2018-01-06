@@ -15,22 +15,26 @@ You should have received a copy of the GNU General Public License
 along with viklund.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-import time
 import vk_api
-import random
-import json
+from vk_api.longpoll import VkLongPoll, VkEventType
 import os
 import sys
-import getpass
 import viklund
 import wikipedia
+import time
 
 class Message:
 	#constants to select destination type
 	PRIVATE_MESSAGE = 1
 	CONVERSATION = 0
 
-
+	@staticmethod
+	def get_dest_id(item):
+		dest_type = viklund.Message.get_dest_type(item)
+		if dest_type == viklund.Message.PRIVATE_MESSAGE:
+			return item[u'user_id']
+		else:
+			return item[u'chat_id']
 	@staticmethod
 	def handle_message():
 		"""
@@ -47,25 +51,31 @@ class Message:
 		FORK_LIMIT = 5
 		while True:
 			try:
-				if viklund.Message.wait_message(values):
-					items = viklund.Message.get_message(values)
-
-				for item in items:
-					if item[u'body'] and item[0] == '/':
-						viklund.Vk_system.log_messages(item, received_str)
-						# fork process for handle_response() execution if available 
-						if fork_count <= FORK_LIMIT:
-							fork_count += 1
-							pid = os.fork()
-							if pid == 0: # if in child process
-								handle_response(item)
-								exit(0) # child process must be closed after the work is done
-						else:
-							#else call function in the same process
-							handle_response(item)
-
-		except Exception as e:
-			viklund.Logging.write_log(viklund.Logging.warning(str(e)))
+				if viklund.Message.wait_message():
+					print('Got message event')
+					response = viklund.Message.get_message(values)
+					print('Got message')
+				if response:
+					last_message_id = response['items'][0]['id']
+					values['last_message_id'] = last_message_id #save last message id to prevent handling the same message twice
+					items = response['items']
+					for item in items:
+						if item['body'] and item['body'][0] == '/':
+							print(viklund.Logging.log_messages(item))
+							# fork process for handle_response() execution if available 
+							#if fork_count <= FORK_LIMIT:
+							#	fork_count += 1
+							#	pid = os.fork()
+							#	if pid == 0: # if in child process
+							#		viklund.handle_response(item)
+							#		exit(0) # child process must be closed after the work is done
+							#else:
+								#else call function in the same process
+							viklund.handle_response(item)
+							del item
+			except Exception as e:
+				viklund.Logging.write_log(viklund.Logging.warning(e))
+			time.sleep(1)
 
 	@staticmethod
 	def wait_message():
@@ -77,7 +87,7 @@ class Message:
 		: bool
 			True if got new message event, false if error occured.
 		"""
-		longpoll = VkLongPoll(vk_session)
+		longpoll = VkLongPoll(viklund.vk_session)
 		for event in longpoll.listen():
 			if event.type == VkEventType.MESSAGE_NEW:
 				return True
@@ -105,14 +115,12 @@ class Message:
 			Dictionary of message items.		
 		"""
 		try:
-			response = viklund.vk.method('messages.get', values)
+			response = viklund.vk_session.method('messages.get', values)
 		except vk_api.VkApiError:
 			raise
 		except vk_api.ApiError:
 			raise
-		if response['items']:
-				values['last_message_id'] = response['items'][0]['id'] #save last message id to prevent handling the same message twice
-		return response['items']
+		return response
 	@staticmethod
 	def parse_attachments(item):
 		"""
@@ -127,26 +135,24 @@ class Message:
 
 		Returns
 		-------
-		list
-			List of attachment strings. Note that 0th element is reserved for text
+		attachments : list
+			List of attachment strings.
 		"""
 		attachments = []
-		attachments[0] = '' #note that 0th element is reserved for text 
-		if item['text']: #if string is not empty
-			attachments[0] = item['text']
-		for attachment in item['attachments']:
-			#attachment syntax is <type><owner_id>_<media_id>_<access_key>
-			att_string = ''
-			att_type = attachment['type']
-			att_owner_id = attachment[att_type]['owner_id']
-			att_media_id = attachment[att_type]['media_id']
-			att_access_key = ''
-			if u'access_key' in attachment[att_type]:
-				att_access_key = '_' + attachment[att_type][access_key]
-			att_string = att_type + att_owner_id + '_' + att_media_id + access_key
-			attachments.append(att_string)
-		#if not attachments: #check if list is empty
-			#raise exception
+		if 'attachments' in item:
+			print('attachments:' + str(item['attachments']))
+			for attachment in item['attachments']:
+				#attachment syntax is <type><owner_id>_<media_id>_<access_key>
+				att_string = ''
+				att_type = attachment['type']
+				att_owner_id = attachment[att_type]['owner_id']
+				att_media_id = attachment[att_type]['id']
+				att_access_key = ''
+				if u'access_key' in attachment[att_type]:
+					att_access_key = '_' + attachment[att_type]['access_key']
+				att_string = '{0}{1}_{2}{3}'.format(att_type,str(att_owner_id),str(att_media_id),att_access_key)
+				print("Attachment is " + str(att_string))
+				attachments.append(att_string)
 		return attachments
 	@staticmethod
 	def get_dest_type(item):
@@ -185,14 +191,16 @@ class Message:
 		"""Messages.send() vk_api method excepts list of attachments to send as string where attachments are separated with comma""" 
 		
 		try:
-			if dest_type != Message.PRIVATE_MESSAGE or dest_type != Message.CONVERSATION:
+			if dest_type != Message.PRIVATE_MESSAGE and dest_type != Message.CONVERSATION:
 				raise ValueError("Invalid dest_type value")
+		except ValueError:
+			raise
 		attachment_str = ','.join(attachments) #separate attachments list with commas	
 		try:
 			if dest_type == Message.PRIVATE_MESSAGE:
-				viklund.vk.method('messages.send', {'user_id':dest_id, 'message':message_text, 'attachment':attachment_str})
-			elif dest_type == Message.CONVERSATION:
-				viklund.vk.method('messages.send', {'chat_id':dest_id, 'message':message_text, 'attachment':attachment_str})
+				viklund.vk_session.method('messages.send', {'user_id':dest_id, 'message':message_text, 'attachment':attachment_str})
+			elif dest_type == Message.CONVERSATION:	
+				viklund.vk_session.method('messages.send', {'chat_id':dest_id, 'message':message_text, 'attachment':attachment_str})
 		except vk_api.VkApiError:
 			raise
 		except vk_api.ApiError:
@@ -206,7 +214,7 @@ class Message:
 
 
 
-				"""
+	"""
 	@staticmethod
 	def resend_user_message(item, received_str): #TODO: send multiply pictures in one message, resend via forwarded messages
 		try:

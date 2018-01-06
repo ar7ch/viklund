@@ -53,7 +53,7 @@ class System():
 			viklund.Logging.write_log(success_message)
 			exit(0)
 		else: #child process code goes here
-			viklund.Vk_system.override_fd()
+			viklund.Logging.override_fd(log_file)
 			viklund.Logging.write_log(success_message)
 			viklund.vkApi = viklund.vk_session.get_api()	
 	@staticmethod
@@ -88,12 +88,12 @@ class System():
 			vk_passwd = args_namespace.password
 		try:
 			#get VK API access
-			vk_session = vk_api.VkApi(login = vk_login, password = vk_passwd)
+			vk_session = viklund.vk_api.VkApi(login = vk_login, password = vk_passwd)
 			vk_session.auth()
 			del vk_login; del vk_passwd; del args_namespace #it might be safer to delete import variables manually
 		except vk_api.AuthError as error_msg:
-			viklund.Logging.write_log(Logging.error('Unable to log in. Please check that you have entered your login and password correctly.'))
+			viklund.Logging.print(viklund.Logging.error('Unable to log in. Please check that you have entered your login and password correctly.'))
 			exit(1)
 		else:
-			viklund.Logging.write_log(Logging.success("Auth successful"))
+			viklund.Logging.write_log(viklund.Logging.success("Auth successful"))
 		return vk_session

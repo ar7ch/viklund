@@ -48,11 +48,13 @@ class PostImport:
 				VK API errors.
 			vk_api.ApiError
 				VK API errors.
+		Returns
+		-------
 
 		"""
 		response = None
 		try:
-			response = viklund.vk.method('wall.get', values)
+			response = viklund.vk_session.method('wall.get', values)
 		except vk_api.VkApiError:
 			raise
 		except vk_api.ApiError:

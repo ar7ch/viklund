@@ -31,14 +31,18 @@ class JsonParser():
 		----------
 		json_data
 			Opened .json file object.
+		section
+			Section of JSON.
 		Returns
-		_______
+		-------
 			commands : dict
 				Dictionary with call_command as key and import_id as value.
 		"""
 		commands = {}
-		for items in json_data[section]:
-			commands[items['call_command']] = items['import_id']
+		for items in json_data['import']:
+			j_key = items['call_command']
+			j_value = items['import_id']
+			commands[j_key] = j_value
 		return commands
 
 	@staticmethod

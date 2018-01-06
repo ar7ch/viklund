@@ -23,16 +23,16 @@ import viklund
 from datetime import datetime
 
 class Logging():
-    HEADER = '\033[95m'
-    OKBLUE = '\033[94m'
-    OKGREEN = '\033[92m'
-    WARNING = '\033[93m'
-    FAIL = '\033[91m'
-    ENDC = '\033[0m'
-    BOLD = '\033[1m'
-    UNDERLINE = '\033[4m'
+	HEADER = '\033[95m'
+	OKBLUE = '\033[94m'
+	OKGREEN = '\033[92m'
+	WARNING = '\033[93m'
+	FAIL = '\033[91m'
+	ENDC = '\033[0m'
+	BOLD = '\033[1m'
+	UNDERLINE = '\033[4m'
 
-    @staticmethod
+	@staticmethod
 	def override_fd(log_fd):
 		"""override stdout and stderr with opened logging file descriptor log_fd"""
 		file_fd = log_fd.fileno() #get file descriptor number of opened file
@@ -40,60 +40,61 @@ class Logging():
 		os.dup2(file_fd, sys.stdout.fileno()) #stdout now will be redirected to our log file
 		os.dup2(dup_fd, sys.stderr.fileno()) #stderr now will be redirected to our log file
 
-    @staticmethod
-    def initialize_logs():
-    	"""
-    	Initialize log folder and log file.
+	@staticmethod
+	def initialize_logs():
+		"""
+		Initialize log folder and log file.
 
-    	Create directory for logging file and logging file (or check if it exists) and return opened file object
+		Create directory for logging file and logging file (or check if it exists) and return opened file object
 
 		Returns
-   		-------
-    	file
-        	Opened log file object
-    	"""
-    	dir_name = 'viklund-logs'
+		-------
+		file
+			Opened log file object
+		"""
+		dir_name = 'viklund-logs'
 		file_name = 'viklund.log'
 		dir_path = os.path.join(os.path.abspath(os.path.dirname(sys.argv[0])), dir_name) #get abs path to logging directory
 		try:
-			os.mkdir(os.path.abspath(log_dir), 0o777)
+			os.mkdir(os.path.abspath(dir_path), 0o777)
 		except OSError as e:
 			if e.errno != errno.EEXIST:
 				raise
-		file_path = os.path.join(log_dir_path, file_name); #join file name to logging directory path
+		file_path = os.path.join(dir_path, file_name); #join file name to logging directory path
 		log_file = None
 		try:	
-			log_file = open(file, 'x') #try to create file
+			log_file = open(file_path, 'x') #try to create file
 		except OSError: #if file already exists
-			log_file = open(file, 'a') #append to file
+			log_file = open(file_path, 'a') #append to file
 		except Exception as e: #something else bad happened
-			viklund.Vk_system.error("unable to write to log file\n" + str(e))
+			print(viklund.Logging.error(str(e)))
+			exit(1)
 		return log_file
 
 	@staticmethod	
-	def message_log_str(item, received_str):
+	def log_messages(item):
 		"""get date of recieved message, and return formatted string for logging output"""
 		format_type = '%d/%m/%Y %H:%M:%S'
 		date = datetime.fromtimestamp(item['date']).strftime(format_type)
-		output_str = 'Пользователь в ' + date + ' вызвал команду: ' + received_str
+		output_str = 'Пользователь в ' + date + ' вызвал команду: ' + item['body']
 		return output_str
 
 	@staticmethod
 	def success(success_message):
-		return Logging.BOLD + Logging.OKGREEN + 'OK: ' + Logging.ENDC + success_message + '\n'
+		return Logging.BOLD + Logging.OKGREEN + 'OK: ' + Logging.ENDC + str(success_message) + '\n'
 
 	@staticmethod
 	def warning(warning_message):
-		return Logging.BOLD + Logging.WARNING + 'WARNING: ' + Logging.ENDC + warning_message + '\n'
+		return Logging.BOLD + Logging.WARNING + 'WARNING: ' + Logging.ENDC + str(warning_message) + '\n'
 
 	@staticmethod
 	def error(error_message):
-		return Logging.BOLD + Logging.FAIL + 'ERROR: ' + Logging.ENDC + '\n'
+		return Logging.BOLD + Logging.FAIL + 'ERROR: ' + Logging.ENDC + str(error_message) + '\n'
 
 	@staticmethod
 	def write_log(output_str):
 		"""write string output_str to log file"""
 		date_format = '%Y-%m-%d %H:%M:%S'
 		date_now = datetime.now().strftime(date_format)
-		time_now = '[' + date_now + '] '
-		print(time_now + additional_string + output_str, file = sys.stderr)
+		time_now = '[ {} ] '.format(date_now)
+		print(time_now + output_str, file = sys.stderr)

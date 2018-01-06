@@ -22,6 +22,6 @@ from datetime import datetime
 
 def main():
 	viklund.System.setup()
-	viklund.handle_messages()
+	viklund.Message.handle_message()
 if __name__ == "__main__":
 	main()
