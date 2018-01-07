@@ -49,7 +49,7 @@ def handle_response(item):
 			t = threading.Thread(target=handle_post_request, args=(arguments, request, item,))
 			#handle_post_request(arguments, request, item)
 		elif command == 'wiki':
-			t = threading.Thread(target=viklund.extra.handle_wiki_search, args=(request,))
+			t = threading.Thread(target=viklund.Extra.handle_wiki_search, args=(request,))
 			#viklund.Extra.handle_wiki_search(request)
 		elif command == 'info':
 			t = threading.Thread(target=handle_info_request, args=(item, request,))
@@ -57,6 +57,8 @@ def handle_response(item):
 		elif command == 'resend':
 			t = threading.Thread(target=handle_resend_request, args=(item,))
 			#handle_resend_request(item)
+		elif command == 'translate':
+			t = threading.Thread(target=viklund.Extra.handle_translate_request, args=(request, arguments,))
 		elif command == 'status':
 			handle_status_request()
 		elif command == 'help':
@@ -84,6 +86,8 @@ def handle_help_request():
 	Commands:
 	/post [-random] <request> - send post from pre-configured list of imports. Sends latest post by default, use -random option to send random post.\n
 	/wiki <request> - search in Wikipedia.\n
+	/translate [-(original language code)] [-(destination language code)] <request> - translate from dest language code (for example, en) to source language code (ru). 
+	Translates from any language to Russian and from Russian to English by default. 
 	/resend - resend media attached to message\n
 	/info <id> - show user's name, domain and id. Specify ID to send other user's info.\n    
 	/status - show bot status.\n

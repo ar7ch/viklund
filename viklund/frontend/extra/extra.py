@@ -20,7 +20,63 @@ along with viklund.  If not, see <http://www.gnu.org/licenses/>.
 
 import viklund
 import wikipedia
+from googletrans import Translator
+
 class Extra:
+	@staticmethod
+	def handle_translate_request(translate_request, arguments):
+		"""
+		Translate text using googletrans module.
+		Parameters
+		-----------
+			translate_request : string
+				String to translate
+			arguments : str list
+				List of arguments. arguments[0] is source language code, arguments[1] is destination language code.
+		Raises
+		-------
+			ValueError
+				If got invalid language code.
+			Exception
+				Other errors occured.
+		"""
+		try:
+			translator = Translator()
+			source_lang = None
+			dest_lang = None
+			if not translate_request:
+				viklund.Message.send('Unable to detect language')
+			if arguments:
+				
+				if len(arguments) == 2:
+					source_lang = arguments[0][1:]
+					dest_lang = arguments[1][1:]
+					translation = translator.translate(translate_request, dest=dest_lang, src=source_lang)
+				else:
+					viklund.Message.send('Please pass two arguments: source language code and destination language code.')
+					return
+			else:
+				detection = translator.detect(translate_request)
+				source_lang = detection.lang
+				if source_lang != 'ru':
+					dest_lang = 'ru'
+					translation = translator.translate(translate_request, dest=dest_lang)
+				elif source_lang == 'ru':
+					dest_lang = 'en'
+					translation = translator.translate(translate_request, dest=dest_lang)
+				else:
+					viklund.Message.send('Unable to detect language')
+					return
+			viklund.Message.send(message_text='''Translated!\nSource language: {0}\nDestination language: {1}'''.format(source_lang, dest_lang))
+			viklund.Message.send(message_text = translation.text)
+		except ValueError:
+			viklund.Message.send(message_text='''Invalid language code! Codes: \n ''')
+			raise
+			return
+		except Exception:
+			raise
+			return
+
 	@staticmethod
 	def handle_wiki_search(search_request):
 		"""
