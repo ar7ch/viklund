@@ -24,7 +24,7 @@ import os
 import sys
 import viklund
 import time
-
+import threading
 class Message:
 	#constants to select destination type
 	PRIVATE_MESSAGE = 1
@@ -80,8 +80,7 @@ class Message:
 				Exceptions ocurred.
 		"""
 		values = {'out': 0,'count': 100,'time_offset': 60}
-		fork_count = 0
-		FORK_LIMIT = 5
+		MAX_THREADS = 11
 		while True:
 			try:
 				if viklund.Message.wait_message():
@@ -94,16 +93,12 @@ class Message:
 						if item['body'] and item['body'][0] == '/':
 							viklund.Message.setup_dest(item) #setup dest_id and dest_type to reply
 							print(viklund.Logging.log_messages(item))
-							# fork process for handle_response() execution if available 
-							#if fork_count <= FORK_LIMIT:
-							#	fork_count += 1
-							#	pid = os.fork()
-							#	if not pid: # if in child process
-							#		viklund.handle_response(item)
-							#		exit(0) # child process must be closed after the work is done
+							#if threading.activeCount() <= MAX_THREADS:
+							t = threading.Thread(target=viklund.handle_response, args=(item,)) #executed twice???
+							t.start()
+
 							#else:
-								#else call function in the same process
-							viklund.handle_response(item)
+							#	viklund.handle_response(item)
 							del item
 			except Exception as e:
 				viklund.Logging.write_log(viklund.Logging.warning(e))
@@ -233,12 +228,11 @@ class Message:
 				VK API errors.
 		"""
 		"""Messages.send() vk_api method excepts list of attachments to send as string where attachments are separated with comma""" 
-		
 		if not send_dest_id: #python gives attribute_error if viklund.dest_id is default value of send_dest_id argument, no idea why
 			send_dest_id = viklund.dest_id
 		if not send_dest_type:
 			send_dest_type = viklund.dest_type
-		
+		print(threading.current_thread().getName())
 		try:
 			if send_dest_type != Message.PRIVATE_MESSAGE and send_dest_type != Message.CONVERSATION:
 				raise ValueError("Invalid dest_type value")

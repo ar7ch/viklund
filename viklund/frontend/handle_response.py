@@ -38,6 +38,7 @@ def handle_response(item):
 	Setup is done - here goes your bot's response code!
 	There are some essential methods that may be useful.
 	"""
+	print('Thread started')
 	request_str = item[u'body'].lower()
 	sep = request_str.split() 
 	command = sep[0][1:] # remove slash char

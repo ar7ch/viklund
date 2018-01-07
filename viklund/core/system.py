@@ -116,7 +116,7 @@ class System():
 			vk_session.auth()
 			del vk_login; del vk_passwd; del args_namespace #it might be safer to delete import variables manually
 		except vk_api.AuthError as error_msg:
-			viklund.Logging.print(viklund.Logging.error('Unable to log in. Please check that you have entered your login and password correctly.'))
+			print(viklund.Logging.error('Unable to log in. Please check that you have entered your login and password correctly.'))
 			exit(1)
 		else:
 			viklund.Logging.write_log(viklund.Logging.success("Auth successful"))
