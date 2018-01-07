@@ -18,7 +18,7 @@ You should have received a copy of the GNU General Public License
 along with viklund.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-
+import threading
 import viklund
 import time
 import os, sys
@@ -38,44 +38,58 @@ def handle_response(item):
 	Setup is done - here goes your bot's response code!
 	There are some essential methods that may be useful.
 	"""
-	print('Thread started')
 	request_str = item[u'body'].lower()
 	sep = request_str.split() 
 	command = sep[0][1:] # remove slash char
 	arguments = parse_request_args(sep)
 	request = parse_request(sep, arguments)
 	try:
+		t = None
 		if command == 'post':
-			handle_post_request(arguments, request, item)
+			t = threading.Thread(target=handle_post_request, args=(arguments, request, item,))
+			#handle_post_request(arguments, request, item)
 		elif command == 'wiki':
-			viklund.Extra.handle_wiki_search(request)
+			t = threading.Thread(target=viklund.extra.handle_wiki_search, args=(request,))
+			#viklund.Extra.handle_wiki_search(request)
 		elif command == 'info':
-			handle_info_request(item, request)
+			t = threading.Thread(target=handle_info_request, args=(item, request,))
+			#handle_info_request(item, request)
 		elif command == 'resend':
-			handle_resend_request(item)
+			t = threading.Thread(target=handle_resend_request, args=(item,))
+			#handle_resend_request(item)
 		elif command == 'status':
-			status_message = '''
-			Viklund Bot v.0.6
-			Status: working
-			Time on server: {}
-			'''.format(datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+			handle_status_request()
 		elif command == 'help':
-			help_message = '''
-			Viklund Bot v.0.6\n
-			Commands:
-			/post [-random] <request> - send post from pre-configured list of imports. Sends latest post by default, use -random option to send random post.\n
-			/wiki <request> - search in Wikipedia.\n
-			/resend - resend media attached to message\n
-			/info <id> - show user's name, domain and id. Specify ID to send other user's info.\n    
-			/status - show bot status.\n
-			/help - print this help message and exit.\n
-			'''#/weather <request> - show weather for specified location.\n
-			viklund.Message.send(message_text=help_message)
+			handle_help_request()
 		else:
-			viklund.Message.send(message_text = '{}: command not found\n/help for help'.format(command))
+			t = threading.Thread(target=handle_not_found)
+		t.start()
 	except Exception as e:
 		raise
-		
+def handle_status_request():
+	status_message = '''
+	Viklund Bot v.0.6
+	Status: working
+	Time on server: {}
+	'''.format(datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+	viklund.Message.send(message_text=status_message)
+
+def handle_not_found():
+	not_found_message = '{}: command not found\n/help for help'.format(command)
+	viklund.Message.send(message_text=not_found_message)
+
+def handle_help_request():
+	help_message = '''
+	Viklund Bot v.0.6\n
+	Commands:
+	/post [-random] <request> - send post from pre-configured list of imports. Sends latest post by default, use -random option to send random post.\n
+	/wiki <request> - search in Wikipedia.\n
+	/resend - resend media attached to message\n
+	/info <id> - show user's name, domain and id. Specify ID to send other user's info.\n    
+	/status - show bot status.\n
+	/help - print this help message and exit.\n
+	'''#/weather <request> - show weather for specified location.\n
+	viklund.Message.send(message_text=help_message)
 def handle_post_request(arguments, request, item, post_values = {'owner_id':None, 'count':1, 'offset':0}):
 	"""
 	Implementation of /post command. 
@@ -122,6 +136,8 @@ def handle_post_request(arguments, request, item, post_values = {'owner_id':None
 			post_resp = viklund.PostImport.get_post(post_values)
 			post_count = post_resp['count']
 			post_values['offset'] = random.randint(0, post_count - 1)
+		else:
+			post_values['offset'] = 0
 
 		response = viklund.PostImport.get_post(post_values)
 		post_items = response['items']
@@ -200,6 +216,7 @@ def handle_info_request(item, request=None):
 	last_name = response[0]['last_name']
 	domain = response[0]['domain']
 	ans_str = '{0} {1}\nID: {2}\nDomain: {3}'.format(first_name, last_name, str(user_id), domain)
+
 	viklund.Message.send(message_text=ans_str)
 
 def handle_resend_request(item):

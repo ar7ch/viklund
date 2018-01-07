@@ -25,6 +25,8 @@ import sys
 import viklund
 import time
 import threading
+import traceback
+
 class Message:
 	#constants to select destination type
 	PRIVATE_MESSAGE = 1
@@ -94,12 +96,13 @@ class Message:
 							viklund.Message.setup_dest(item) #setup dest_id and dest_type to reply
 							print(viklund.Logging.log_messages(item))
 							#if threading.activeCount() <= MAX_THREADS:
-							t = threading.Thread(target=viklund.handle_response, args=(item,)) #executed twice???
-							t.start()
+							#from pdb_clone import pdb; pdb.set_trace_remote()
+							#t = threading.Thread(target=viklund.handle_response, args=(item,)) #executed twice???
+							#t.start()
 
 							#else:
-							#	viklund.handle_response(item)
-							del item
+							viklund.handle_response(item)
+							#del item
 			except Exception as e:
 				viklund.Logging.write_log(viklund.Logging.warning(e))
 			time.sleep(1)
@@ -232,7 +235,6 @@ class Message:
 			send_dest_id = viklund.dest_id
 		if not send_dest_type:
 			send_dest_type = viklund.dest_type
-		print(threading.current_thread().getName())
 		try:
 			if send_dest_type != Message.PRIVATE_MESSAGE and send_dest_type != Message.CONVERSATION:
 				raise ValueError("Invalid dest_type value")
