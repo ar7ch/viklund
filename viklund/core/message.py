@@ -244,7 +244,7 @@ class Message:
 		try:
 			if send_dest_type == Message.PRIVATE_MESSAGE:
 				viklund.vk_session.method('messages.send', {'user_id':send_dest_id, 'message':message_text, 'attachment':attachment_str})
-			elif send_dest_type == Message.CONVERSATION:	
+			else:	
 				viklund.vk_session.method('messages.send', {'chat_id':send_dest_id, 'message':message_text, 'attachment':attachment_str})
 		except vk_api.VkApiError:
 			raise

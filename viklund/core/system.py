@@ -70,10 +70,15 @@ class System():
 				Arguments namespace.
 		"""
 		arg_parser = argparse.ArgumentParser()
-		arg_parser.add_argument('-l', '--login', nargs='?', type=str, action='store', help='input login, UNSAFE, USE CAREFULLY') #
-		arg_parser.add_argument('-p', '--password', nargs='?', type=str, action='store', help='input password, UNSAFE, USE CAREFULLY')
+		arg_parser.add_argument('-l', '--login', nargs='?', type=str, action='store', help='pass login via commandline, UNSAFE, USE CAREFULLY') #
+		arg_parser.add_argument('-p', '--password', nargs='?', type=str, action='store', help='pass password via commandline, UNSAFE, USE CAREFULLY')
+		
+		arg_parser.add_argument('-i', '--input_token', nargs='?', type=str, action='store', help='Pass token via commandline, UNSAFE, USE CAREFULLY')
+		arg_parser.add_argument('-t', '--token', action='store_const', const=True, help='make Viklund wait for input a token, not login and password')
+		
 		arg_parser.add_argument('-j', '--json_path', nargs='?', type=str, action='store', help='Path to .json file, needed for group post import, example: /path/to/file.json')
 		arg_parser.add_argument('-g', '--log_path', nargs='?', type=str, action='store', help='Path where logs directory should be created')
+		
 		args_namespace = arg_parser.parse_args(sys.argv[1:])
 		if args_namespace.json_path:
 			viklund.JSON_PATH = args_namespace.json_path
@@ -98,21 +103,33 @@ class System():
 				Authentication error.
 		"""
 		vk_session = None
+		vk_token = None
+		vk_login = None
+		vk_passwd = None
 		print('Viklund v.0.6')
 		#if user haven't provided login as commandline argument, ask him for login
 		#otherwise, we'll just copy login from namespace variable to local variable
-		if not args_namespace.login: 
-			vk_login = input('Login:')
-		else:
+		if not args_namespace.login:
+			if args_namespace.input_token:
+				vk_token = args_namespace.input_token
+			elif args_namespace.token:
+				vk_token = input('Token:')
+			else:
+				vk_login = input('Login:')
+		if args_namespace.login:
 			vk_login = args_namespace.login
 		#same for password
 		if not args_namespace.password:
-			vk_passwd = getpass.getpass('Password:')
-		else:
+			if not vk_token:
+				vk_passwd = getpass.getpass('Password:')
+		elif args_namespace.password:
 			vk_passwd = args_namespace.password
 		try:
 			#get VK API access
-			vk_session = viklund.vk_api.VkApi(login = vk_login, password = vk_passwd)
+			if vk_token:
+				vk_session = viklund.vk_api.VkApi(token = vk_token)
+			else:
+				vk_session = viklund.vk_api.VkApi(login = vk_login, password = vk_passwd)
 			vk_session.auth()
 			del vk_login; del vk_passwd; del args_namespace #it might be safer to delete import variables manually
 		except vk_api.AuthError as error_msg:
