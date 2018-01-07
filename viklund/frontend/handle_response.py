@@ -25,6 +25,49 @@ import os, sys
 from datetime import datetime
 import random
 
+def handle_response(item):
+	"""
+	Setup is done - here goes your bot's response code!
+	There are some essential methods that may be useful.
+	"""
+	viklund.Message.setup_dest(item) #setup dest_id and dest_type to reply
+	request_str = item[u'body'].lower()
+	sep = request_str.split() 
+	command = sep[0][1:] # remove slash char
+	arguments = parse_request_args(sep)
+	request = parse_request(sep, arguments)
+	try:
+		if command == 'post':
+			handle_post_request(arguments, request, item)
+		elif command == 'wiki':
+			viklund.Extra.handle_wiki_search(request)
+		elif command == 'info':
+			handle_info_request(item, request)
+		elif command == 'resend':
+			handle_resend_request(item)
+		elif command == 'status':
+			status_message = '''
+			Viklund Bot v.0.6
+			Status: working
+			Time on server: {}
+			'''.format(datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+		elif command == 'help':
+			help_message = '''
+			Viklund Bot v.0.6\n
+			Commands:
+			/post [-random] <request> - send post from pre-configured list of imports. Sends latest post by default, use -random option to send random post.\n
+			/wiki <request> - search in Wikipedia.\n
+			/resend - resend media attached to message\n
+			/info <id> - show user's name, domain and id. Specify ID to send other user's info.\n    
+			/status - show bot status.\n
+			/help - print this help message and exit.\n
+			'''#/weather <request> - show weather for specified location.\n
+			viklund.Message.send(message_text=help_message)
+		else:
+			viklund.Message.send(message_text = '{}: command not found\n/help for help'.format(command))
+	except Exception as e:
+		raise
+		
 def handle_post_request(arguments, request, item, post_values = {'owner_id':None, 'count':1, 'offset':0}):
 	"""
 	Implementation of /post command. 
@@ -166,45 +209,3 @@ def handle_resend_request(item):
 		return -1
 	viklund.Message.send(attachments = attachments_list)
 
-def handle_response(item):
-	"""
-	Setup is done - here goes your bot's response code!
-	There are some essential methods that may be useful.
-	"""
-	viklund.Message.setup_dest(item) #setup dest_id and dest_type to reply
-	request_str = item[u'body'].lower()
-	sep = request_str.split() 
-	command = sep[0][1:] # remove slash char
-	arguments = parse_request_args(sep)
-	request = parse_request(sep, arguments)
-	try:
-		if command == 'post':
-			handle_post_request(arguments, request, item)
-		elif command == 'wiki':
-			viklund.Extra.handle_wiki_search(request)
-		elif command == 'info':
-			handle_info_request(item, request)
-		elif command == 'resend':
-			handle_resend_request(item)
-		elif command == 'status':
-			status_message = '''
-			Viklund Bot v.0.6
-			Status: working
-			Time on server: {}
-			'''.format(datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
-		elif command == 'help':
-			help_message = '''
-			Viklund Bot v.0.6\n
-			Commands:
-			/post [-random] <request> - send post from pre-configured list of imports. Sends latest post by default, use -random option to send random post.\n
-			/wiki <request> - search in Wikipedia.\n
-			/resend - resend media attached to message\n
-			/info <id> - show user's name, domain and id. Specify ID to send other user's info.\n    
-			/status - show bot status.\n
-			/help - print this help message and exit.\n
-			'''#/weather <request> - show weather for specified location.\n
-			viklund.Message.send(message_text=help_message)
-		else:
-			viklund.Message.send(message_text = '{}: command not found\n/help for help'.format(command))
-	except Exception as e:
-		raise

@@ -1,8 +1,10 @@
 {
-	"_comment": "Example post import configuration file",
+	"__comment": "Example post import configuration file",
+	"__comment": "JSON doesn't support actual comments so please don't parse ",
+	"__comment": "Post import config is JSON file containing list of communities and pages which posts Viklund will be able to send to users by request",
 	"import": [
 	{
-		"_comment": "call_command is command string that user calls, import_id is id of import source (use negative value for groups)",
+		"__comment": "call_command is command string that user calls, import_id is id of import source (use negative value for groups)",
 		"call_command":"command",
 		"import_id": -42424242
 		
