@@ -20,7 +20,6 @@ along with viklund.  If not, see <http://www.gnu.org/licenses/>.
 
 from core import *
 from frontend import *
-from extra import *
 
 dest_type = None
 dest_id = None

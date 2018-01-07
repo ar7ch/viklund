@@ -26,11 +26,18 @@ from datetime import datetime
 import random
 
 def handle_response(item):
+	""" no idea how to call this, so i call this frontend"""
+	
+	"""
+	This file implement user's interaction with bot - commands and responses to commands.
+	You can edit this file freely because there is no function that depends on these functions
+	Except handle_messages() - it sends message item to this function for you to handle user request.
+	"""
+
 	"""
 	Setup is done - here goes your bot's response code!
 	There are some essential methods that may be useful.
 	"""
-	viklund.Message.setup_dest(item) #setup dest_id and dest_type to reply
 	request_str = item[u'body'].lower()
 	sep = request_str.split() 
 	command = sep[0][1:] # remove slash char

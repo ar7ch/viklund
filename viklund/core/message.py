@@ -92,6 +92,7 @@ class Message:
 					items = response['items']
 					for item in items:
 						if item['body'] and item['body'][0] == '/':
+							viklund.Message.setup_dest(item) #setup dest_id and dest_type to reply
 							print(viklund.Logging.log_messages(item))
 							# fork process for handle_response() execution if available 
 							#if fork_count <= FORK_LIMIT:
