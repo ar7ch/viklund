@@ -45,7 +45,7 @@ class Extra:
 			source_lang = None
 			dest_lang = None
 			if not translate_request:
-				viklund.Message.send('Unable to detect language')
+				viklund.Message.send(message_text='Nothing to translate')
 			if arguments:
 				
 				if len(arguments) == 2:
@@ -53,7 +53,7 @@ class Extra:
 					dest_lang = arguments[1][1:]
 					translation = translator.translate(translate_request, dest=dest_lang, src=source_lang)
 				else:
-					viklund.Message.send('Please pass two arguments: source language code and destination language code.')
+					viklund.Message.send(message_text='Please pass two arguments: source language code and destination language code.')
 					return
 			else:
 				detection = translator.detect(translate_request)
@@ -65,12 +65,12 @@ class Extra:
 					dest_lang = 'en'
 					translation = translator.translate(translate_request, dest=dest_lang)
 				else:
-					viklund.Message.send('Unable to detect language')
+					viklund.Message.send(viklund.Message.send(message_text='Unable to detect language'))
 					return
 			viklund.Message.send(message_text='''Translated!\nSource language: {0}\nDestination language: {1}'''.format(source_lang, dest_lang))
 			viklund.Message.send(message_text = translation.text)
 		except ValueError:
-			viklund.Message.send(message_text='''Invalid language code! Codes: \n ''')
+			viklund.Message.send(message_text='''Invalid language code!''')
 			raise
 			return
 		except Exception:
