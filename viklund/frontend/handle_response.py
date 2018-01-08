@@ -44,29 +44,37 @@ def handle_response(item):
 	arguments = parse_request_args(sep)
 	request = parse_request(sep, arguments)
 	try:
-		t = None
-		if command == 'post':
-			t = threading.Thread(target=handle_post_request, args=(arguments, request, item,))
-			#handle_post_request(arguments, request, item)
-		elif command == 'wiki':
-			t = threading.Thread(target=viklund.Extra.handle_wiki_search, args=(request,))
-			#viklund.Extra.handle_wiki_search(request)
-		elif command == 'info':
-			t = threading.Thread(target=handle_info_request, args=(item, request,))
-			#handle_info_request(item, request)
-		elif command == 'resend':
-			t = threading.Thread(target=handle_resend_request, args=(item,))
-			#handle_resend_request(item)
-		elif command == 'translate':
-			t = threading.Thread(target=viklund.Extra.handle_translate_request, args=(request, arguments,))
-		elif command == 'status':
-			handle_status_request()
-		elif command == 'help':
-			handle_help_request()
-		else:
-			t = threading.Thread(target=handle_not_found)
+		t = threading.Thread(target=response, args=(item, request, command, arguments,))
 		t.start()
 	except Exception as e:
+		raise
+
+def response(item, request, command, arguments):
+	try:
+		if command == 'post':
+			#handle_post_request(arguments, request, item)
+		elif command == 'wiki':
+			viklund.Extra.handle_wiki_search(request)
+			#viklund.Extra.handle_wiki_search(request)
+		elif command == 'info':
+			#t = threading.Thread(target=handle_info_request, args=(item, request,))
+			handle_info_request(item, request)
+		elif command == 'resend':
+			#t = threading.Thread(target=handle_resend_request, args=(item,))
+			handle_resend_request(item)
+		elif command == 'translate':
+			#t = threading.Thread(target=viklund.Extra.handle_translate_request, args=(request, arguments,))
+			viklund.Extra.handle_translate_request(request, arguments)
+		elif command == 'status':
+			#t = threading.Thread(target=handle_status_request)
+			handle_status_request()
+		elif command == 'help':
+			#t = threading.Thread(target=handle_help_request)
+			handle_help_request()
+		else:
+			#t = threading.Thread(target=handle_not_found, args=(command,))
+			handle_not_found(command)
+	except Exception:
 		raise
 def handle_status_request():
 	status_message = '''
@@ -76,7 +84,7 @@ def handle_status_request():
 	'''.format(datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
 	viklund.Message.send(message_text=status_message)
 
-def handle_not_found():
+def handle_not_found(command):
 	not_found_message = '{}: command not found\n/help for help'.format(command)
 	viklund.Message.send(message_text=not_found_message)
 
