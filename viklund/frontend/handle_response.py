@@ -52,27 +52,20 @@ def handle_response(item):
 def response(item, request, command, arguments):
 	try:
 		if command == 'post':
-			#handle_post_request(arguments, request, item)
+			handle_post_request(arguments, request, item)
 		elif command == 'wiki':
 			viklund.Extra.handle_wiki_search(request)
-			#viklund.Extra.handle_wiki_search(request)
 		elif command == 'info':
-			#t = threading.Thread(target=handle_info_request, args=(item, request,))
 			handle_info_request(item, request)
 		elif command == 'resend':
-			#t = threading.Thread(target=handle_resend_request, args=(item,))
 			handle_resend_request(item)
 		elif command == 'translate':
-			#t = threading.Thread(target=viklund.Extra.handle_translate_request, args=(request, arguments,))
 			viklund.Extra.handle_translate_request(request, arguments)
 		elif command == 'status':
-			#t = threading.Thread(target=handle_status_request)
 			handle_status_request()
 		elif command == 'help':
-			#t = threading.Thread(target=handle_help_request)
 			handle_help_request()
 		else:
-			#t = threading.Thread(target=handle_not_found, args=(command,))
 			handle_not_found(command)
 	except Exception:
 		raise
