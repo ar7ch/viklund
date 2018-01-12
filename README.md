@@ -28,8 +28,8 @@ Viklund can:
 
 1. Install vk_api module: 
 `# pip install vk_api`
-  1.1. Install wikipedia module to use bot's Wikipedia search
-  1.2. Install googletrans module to use bot's Google Translate translation. 
+    1.1 (Optional) Install wikipedia module to use bot's Wikipedia search
+    1.2 (Optional) Install googletrans module to use bot's Google Translate translation. 
  2. Download Viklund: 
 `$ git clone https://github.com/blgkv/viklund.git`
 
@@ -39,7 +39,8 @@ Viklund can:
 3. Launch `main.py` with needed arguments (`$ python main.py --help` for help)
 
 ## License
-[GPL](https://github.com/blgkv/viklund/blob/master/LICENSE)
+[GPLv3](https://github.com/blgkv/viklund/blob/master/LICENSE)
+
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 
 ## Thanks to:
