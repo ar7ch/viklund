@@ -39,7 +39,8 @@ Viklund can:
 3. Launch `main.py` with needed arguments (`$ python main.py --help` for help)
 
 ## License
-[GPL](https://github.com/blgkv/viklund/blob/master/LICENSE)
+[GNU GPLv3](https://github.com/blgkv/viklund/blob/master/LICENSE)
+
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 
 ## Thanks to:
