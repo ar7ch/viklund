@@ -28,8 +28,8 @@ Viklund can:
 
 1. Install vk_api module: 
 `# pip install vk_api`
-  1.1. Install wikipedia module to use bot's Wikipedia search
-  1.2. Install googletrans module to use bot's Google Translate translation. 
+    1.1 (Optional) Install wikipedia module to use bot's Wikipedia search
+    1.2 (Optional) Install googletrans module to use bot's Google Translate translation. 
  2. Download Viklund: 
 `$ git clone https://github.com/blgkv/viklund.git`
 
