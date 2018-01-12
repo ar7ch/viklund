@@ -52,19 +52,19 @@ def handle_response(item):
 
 def response(item, request, command, arguments):
 	try:
-		if command == 'post':
+		if command == 'пост':
 			handle_post_request(arguments, request, item)
-		elif command == 'wiki':
+		elif command == 'вики':
 			viklund.Extra.handle_wiki_search(request)
-		elif command == 'info':
+		elif command == 'инфо':
 			handle_info_request(item, request)
-		elif command == 'resend':
+		elif command == 'перешли':
 			handle_resend_request(item)
-		elif command == 'translate':
+		elif command == 'перевод':
 			viklund.Extra.handle_translate_request(request, arguments)
-		elif command == 'status':
+		elif command == 'статус':
 			handle_status_request()
-		elif command == 'help':
+		elif command == 'помощь':
 			handle_help_request()
 		else:
 			handle_not_found(command)
@@ -73,33 +73,34 @@ def response(item, request, command, arguments):
 def handle_status_request():
 	status_message = '''
 	Viklund Bot v.0.6
-	Status: working
-	Time on server: {}
+	Статус: работает
+	Время на сервере: {}
 	'''.format(datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
 	viklund.Message.send(message_text=status_message)
 
 def handle_not_found(command):
-	not_found_message = '{}: command not found\n/help for help'.format(command)
+	not_found_message = '{}: команда не найдена\n/помощь для справки'.format(command)
 	viklund.Message.send(message_text=not_found_message)
 
 def handle_help_request():
 	help_message = '''
 	Viklund Bot v.0.6
-	Commands:
-	/post [-random] <request> - send post from pre-configured list of imports. Sends latest post by default, use -random option to send random post.
-	
-	/wiki <request> - search in Wikipedia.
-	
-	/translate [-(original language code)] [-(destination language code)] <request> - translate from dest language code (for example, en) to source language code (ru).
-	Translates from any language to Russian and from Russian to English by default. 
-	
-	/resend - resend media attached to message.
-	
-	/info <id> - show user's name, domain and id. Specify ID to send other user's info.
-	
-	/status - show bot status.
+	Доступные команды:
 
-	/help - print this help message and exit.
+	/пост [-рандом] <запрос> - отправить пост из списка источников. По умолчанию отправляет самый свежий пост, используйте опцию -рандом, чтобы отправить случайный пост.
+	
+	/вики <запрос> - поиск в Википедии.
+	
+	/перевод [-(код языка оригинала)] [-(код языка, на который нужно перевести)] <запрос> - перевод с одного языка на другой.
+	По умолчанию переводит с любого языка на русский и с русского на английский.
+
+	/перешли - переслать медиа (фотографии, документы и т.д.), прикрепленные к сообщению.
+	
+	/инфо <id> - показать информацию о пользователе. Укажите ID, чтобы показать информацию для другого пользователя.  
+	
+	/статус - показать статус бота.
+	
+	/помощь - показать это сообщение.
 	'''#/weather <request> - show weather for specified location.\n
 	viklund.Message.send(message_text=help_message)
 def handle_post_request(arguments, request, item, post_values = {'owner_id':None, 'count':1, 'offset':0}):
@@ -135,16 +136,16 @@ def handle_post_request(arguments, request, item, post_values = {'owner_id':None
 			post_values['owner_id'] = requests[request]
 		else:
 			log_not_found_string = 'User request not found: {}\n'.format(request)
-			not_found_string = 'Request not found: {}\n/help for help message, /post for available imports\n'.format(request)
-			no_request_string = 'Usage: /post (-random) <request>\nAvailable imports: \n{}'.format('\n'.join(requests.keys()))
+			not_found_string = 'Запрос не найден: {}\n/помощь для справки, /пост для доступных импортов\n'.format(request)
+			no_request_string = 'Использование: /пост (-рандом) <запрос>\nДоступные импорты: \n{}'.format('\n'.join(requests.keys()))
 			if not request:
 				viklund.Message.send(message_text = no_request_string)
 			else:
 				viklund.Message.send(message_text = not_found_string)
-				raise KeyError(log_not_found_string = 'User request not found: {}\n'.format(request))
+				raise KeyError(log_not_found_string)
 			return
 		#TODO: send more than 1 post
-		if '-random' in arguments:
+		if '-рандом' in arguments:
 			# random offset requires calling get_post() to get posts count
 			post_resp = viklund.PostImport.get_post(post_values)
 			post_count = post_resp['count']
@@ -243,7 +244,7 @@ def handle_resend_request(item):
 	"""
 	attachments_list = viklund.Message.parse_attachments(item)
 	if not attachments_list:
-		viklund.Message.send(message_text='Nothing to resend')
+		viklund.Message.send(message_text='Нечего пересылать')
 		return -1
 	viklund.Message.send(attachments = attachments_list)
 

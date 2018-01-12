@@ -45,7 +45,7 @@ class Extra:
 			source_lang = None
 			dest_lang = None
 			if not translate_request:
-				viklund.Message.send(message_text='Nothing to translate')
+				viklund.Message.send(message_text='Нечего переводить')
 			if arguments:
 				
 				if len(arguments) == 2:
@@ -53,7 +53,7 @@ class Extra:
 					dest_lang = arguments[1][1:]
 					translation = translator.translate(translate_request, dest=dest_lang, src=source_lang)
 				else:
-					viklund.Message.send(message_text='Please pass two arguments: source language code and destination language code.')
+					viklund.Message.send(message_text='Пожалуйста, укажите два аргумента (начинающихся со -): код исходного языка и код языка назначения.')
 					return
 			else:
 				detection = translator.detect(translate_request)
@@ -67,10 +67,10 @@ class Extra:
 				else:
 					viklund.Message.send(viklund.Message.send(message_text='Unable to detect language'))
 					return
-			viklund.Message.send(message_text='''Translated!\nSource language: {0}\nDestination language: {1}'''.format(source_lang, dest_lang))
+			viklund.Message.send(message_text='''Переведено!\nИсходный язык: {0}\nЯзык назначения: {1}'''.format(source_lang, dest_lang))
 			viklund.Message.send(message_text = translation.text)
 		except ValueError:
-			viklund.Message.send(message_text='''Invalid language code!''')
+			viklund.Message.send(message_text='''Неверный код языка!''')
 			raise
 			return
 		except Exception:
@@ -101,7 +101,7 @@ class Extra:
 			search_result = wikipedia.summary(search_request)
 			viklund.Message.send(message_text=search_result)
 		except wikipedia.PageError:
-			viklund.Message.send(message_text= '{}: not found'.format(search_request))
+			viklund.Message.send(message_text= '{}: не найдено'.format(search_request))
 			raise
 			return
 		except wikipedia.DisambiguationError as e:
@@ -109,7 +109,7 @@ class Extra:
 			raise
 			return
 		except:
-			viklund.Message.send(message_text='An error occurred while searching')
+			viklund.Message.send(message_text='Произошла ошибка во время поиска')
 			raise
 	def handle_weather_request(request): #coming soon
 		pass
