@@ -141,7 +141,7 @@ def handle_post_request(arguments, request, item, post_values = {'owner_id':None
 				viklund.Message.send(message_text = no_request_string)
 			else:
 				viklund.Message.send(message_text = not_found_string)
-				raise KeyError(log_not_found_string = 'User request not found: {}\n'.format(request))
+				raise KeyError(log_not_found_string)
 			return
 		#TODO: send more than 1 post
 		if '-random' in arguments:
