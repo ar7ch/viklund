@@ -30,8 +30,9 @@ def handle_response(item):
 	
 	"""
 	This file implement user's interaction with bot - commands and responses to commands.
-	You can edit this file freely because there is no function that depends on these functions
-	Except handle_messages() - it sends message item to this function for you to handle user request.
+	You can edit this file freely because there is no function that Viklund core functions depend on.
+	Except handle_response() - it is the function where message item are sent to for you to handle user request.
+	Please do not change this function's name and arguments if you are not going to edit Viklund core code.
 	"""
 
 	"""
@@ -83,16 +84,22 @@ def handle_not_found(command):
 
 def handle_help_request():
 	help_message = '''
-	Viklund Bot v.0.6\n
+	Viklund Bot v.0.6
 	Commands:
-	/post [-random] <request> - send post from pre-configured list of imports. Sends latest post by default, use -random option to send random post.\n
-	/wiki <request> - search in Wikipedia.\n
-	/translate [-(original language code)] [-(destination language code)] <request> - translate from dest language code (for example, en) to source language code (ru). 
+	/post [-random] <request> - send post from pre-configured list of imports. Sends latest post by default, use -random option to send random post.
+	
+	/wiki <request> - search in Wikipedia.
+	
+	/translate [-(original language code)] [-(destination language code)] <request> - translate from dest language code (for example, en) to source language code (ru).
 	Translates from any language to Russian and from Russian to English by default. 
-	/resend - resend media attached to message\n
-	/info <id> - show user's name, domain and id. Specify ID to send other user's info.\n    
-	/status - show bot status.\n
-	/help - print this help message and exit.\n
+	
+	/resend - resend media attached to message.
+	
+	/info <id> - show user's name, domain and id. Specify ID to send other user's info.
+	
+	/status - show bot status.
+
+	/help - print this help message and exit.
 	'''#/weather <request> - show weather for specified location.\n
 	viklund.Message.send(message_text=help_message)
 def handle_post_request(arguments, request, item, post_values = {'owner_id':None, 'count':1, 'offset':0}):
@@ -127,13 +134,14 @@ def handle_post_request(arguments, request, item, post_values = {'owner_id':None
 		if request in requests:
 			post_values['owner_id'] = requests[request]
 		else:
+			log_not_found_string = 'User request not found: {}\n'.format(request)
 			not_found_string = 'Request not found: {}\n/help for help message, /post for available imports\n'.format(request)
 			no_request_string = 'Usage: /post (-random) <request>\nAvailable imports: \n{}'.format('\n'.join(requests.keys()))
 			if not request:
 				viklund.Message.send(message_text = no_request_string)
 			else:
 				viklund.Message.send(message_text = not_found_string)
-				raise KeyError(not_found_string)
+				raise KeyError(log_not_found_string = 'User request not found: {}\n'.format(request))
 			return
 		#TODO: send more than 1 post
 		if '-random' in arguments:

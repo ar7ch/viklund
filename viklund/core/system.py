@@ -48,17 +48,22 @@ class System():
 		so we do auth procedure, clone process with fork() and exit the parent process
 		even if user closes terminal, the bot process will be alive
 		"""
-		pid = os.fork()
-		if pid: #parent process code goes here (pid > 0)
-			#parent only shows success message and exits
-			success_message = viklund.Logging.success('Bot started with PID ' + str(pid))
-			viklund.Logging.write_log(success_message) #output to terminal
-			viklund.Logging.override_fd(log_file)
-			viklund.Logging.write_log(success_message) #output to log file
-			exit(0)
-		else: #child process code goes here
-			viklund.vkApi = viklund.vk_session.get_api()
-			viklund.Logging.override_fd(log_file)
+		if os.name == 'posix': #check if system posix-compatible
+			pid = os.fork()
+			if pid: #parent process code goes here (pid != 0)
+				#parent only exits
+				exit(0)
+		else:
+			not_posix_message = '''Looks like this system is non-POSIX, so some features like running in background do not work. 
+			Viklund will only work until you close the window where you launched it. 
+			Please consider using POSIX-compatible system or WSL (if on Windows)'''
+			viklund.Logging.write_log(viklund.Logging.warning(not_posix_message))
+
+		viklund.vkApi = viklund.vk_session.get_api()
+		success_message = viklund.Logging.success('Bot started with PID ' + str(os.getpid()))
+		viklund.Logging.write_log(success_message) #output to terminal
+		viklund.Logging.override_fd(log_file)
+		viklund.Logging.write_log(success_message) #output to log file
 	@staticmethod
 	def handle_args():
 		"""
