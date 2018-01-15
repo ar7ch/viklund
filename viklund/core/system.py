@@ -54,13 +54,13 @@ class System():
 				#parent only exits
 				exit(0)
 		else:
-			not_posix_message = '''Looks like this system is non-POSIX, so some features like running in background do not work. 
-			Viklund will only work until you close the window where you launched it. 
-			Please consider using POSIX-compatible system or WSL (if on Windows)'''
+			not_posix_message = '''Похоже, что эта система - не POSIX-совместимая, поэтому некоторые функции вроде работы в фоне не поддерживаются. 
+			Viklund будет работать, пока вы не закроете окно, в котором он запущен. 
+			Пожалуйста, рассмотрите возможность использования POSIX-совместимой ОС или WSL (если на Windows)'''
 			viklund.Logging.write_log(viklund.Logging.warning(not_posix_message))
 
 		viklund.vkApi = viklund.vk_session.get_api()
-		success_message = viklund.Logging.success('Bot started with PID ' + str(os.getpid()))
+		success_message = viklund.Logging.success('Бот запущен с PID ' + str(os.getpid()))
 		viklund.Logging.write_log(success_message) #output to terminal
 		viklund.Logging.override_fd(log_file)
 		viklund.Logging.write_log(success_message) #output to log file
@@ -75,20 +75,20 @@ class System():
 				Arguments namespace.
 		"""
 		arg_parser = argparse.ArgumentParser()
-		arg_parser.add_argument('-l', '--login', nargs='?', type=str, action='store', help='pass login via commandline, UNSAFE, USE CAREFULLY') #
-		arg_parser.add_argument('-p', '--password', nargs='?', type=str, action='store', help='pass password via commandline, UNSAFE, USE CAREFULLY')
+		arg_parser.add_argument('-l', '--login', nargs='?', type=str, action='store', help='передать логин как аргумент командной строки') #
+		arg_parser.add_argument('-p', '--password', nargs='?', type=str, action='store', help='передать пароль как аргумент командной строки, НЕБЕЗОПАСНО, ИСПОЛЬЗУЙТЕ С ОСТОРОЖНОСТЬЮ')
 		
-		arg_parser.add_argument('-i', '--input_token', nargs='?', type=str, action='store', help='Pass token via commandline, UNSAFE, USE CAREFULLY')
-		arg_parser.add_argument('-t', '--token', action='store_const', const=True, help='make Viklund wait for input a token, not login and password')
+		arg_parser.add_argument('-i', '--input_token', nargs='?', type=str, action='store', help='Передать токен как аргумент командной строки, НЕБЕЗОПАСНО, ИСПОЛЬЗУЙТЕ С ОСТОРОЖНОСТЬЮ')
+		arg_parser.add_argument('-t', '--token', action='store_const', const=True, help='Заставить Viklund ждать на вход токен вместо логина и пароля')
 		
-		arg_parser.add_argument('-j', '--json_path', nargs='?', type=str, action='store', help='Path to .json file, needed for group post import, example: /path/to/file.json')
-		arg_parser.add_argument('-g', '--log_path', nargs='?', type=str, action='store', help='Path where logs directory should be created')
+		arg_parser.add_argument('-j', '--json_path', nargs='?', type=str, action='store', help='Путь к .json файлу импортов, пример: /путь/к/файлу.json')
+		arg_parser.add_argument('-g', '--log_path', nargs='?', type=str, action='store', help='Указать путь к директории с лог-файлами')
 		
 		args_namespace = arg_parser.parse_args(sys.argv[1:])
 		if args_namespace.json_path:
 			viklund.JSON_PATH = args_namespace.json_path
 		else:
-			viklund.JSON_PATH = os.path.abspath(os.path.dirname(sys.argv[0])) + '/default.json'
+			viklund.JSON_PATH = os.path.abspath(os.path.dirname(sys.argv[0])) + '/example.json'
 		if args_namespace.log_path:
 			viklund.LOGS_PATH = args_namespace.log_path
 		return args_namespace
@@ -118,15 +118,15 @@ class System():
 			if args_namespace.input_token:
 				vk_token = args_namespace.input_token
 			elif args_namespace.token:
-				vk_token = input('Token:')
+				vk_token = input('Токен:')
 			else:
-				vk_login = input('Login:')
+				vk_login = input('Логин:')
 		if args_namespace.login:
 			vk_login = args_namespace.login
 		#same for password
 		if not args_namespace.password:
 			if not vk_token:
-				vk_passwd = getpass.getpass('Password:')
+				vk_passwd = getpass.getpass('Пароль:')
 		elif args_namespace.password:
 			vk_passwd = args_namespace.password
 		try:
@@ -138,8 +138,8 @@ class System():
 			vk_session.auth()
 			del vk_login; del vk_passwd; del args_namespace #it might be safer to delete import variables manually
 		except vk_api.AuthError as error_msg:
-			print(viklund.Logging.error('Unable to log in. Please check that you have entered your login and password correctly.'))
+			print(viklund.Logging.error('Не удалось войти. Убедитесь, что вы правильно ввели логин и пароль.'))
 			exit(1)
 		else:
-			viklund.Logging.write_log(viklund.Logging.success("Auth successful"))
+			viklund.Logging.write_log(viklund.Logging.success("Аутентификация успешна"))
 		return vk_session
