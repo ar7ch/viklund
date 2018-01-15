@@ -104,7 +104,7 @@ class Message:
 							viklund.handle_response(item)
 							#del item
 			except Exception as e:
-				viklund.Logging.write_log(viklund.Logging.warning(e))
+				viklund.Logging.write_log(viklund.Logging.warning(str(e)))
 			time.sleep(1)
 
 	@staticmethod
