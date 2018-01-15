@@ -45,10 +45,14 @@ def handle_response(item):
 	arguments = parse_request_args(sep)
 	request = parse_request(sep, arguments)
 	try:
-		t = threading.Thread(target=response, args=(item, request, command, arguments,))
-		t.start()
+		response(item, request, command, arguments)
 	except Exception as e:
-		raise
+		exception_message = None
+		if hasattr(e, 'message'):
+			exception_message = e.message()
+		else:
+			exception_message = str(e)
+		print(viklund.Logging.warning(e))
 
 def response(item, request, command, arguments):
 	try:

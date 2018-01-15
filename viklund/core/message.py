@@ -95,16 +95,15 @@ class Message:
 						if item['body'] and item['body'][0] == '/':
 							viklund.Message.setup_dest(item) #setup dest_id and dest_type to reply
 							print(viklund.Logging.log_messages(item))
-							#if threading.activeCount() <= MAX_THREADS:
-							#from pdb_clone import pdb; pdb.set_trace_remote()
-							#t = threading.Thread(target=viklund.handle_response, args=(item,)) #executed twice???
-							#t.start()
-
-							#else:
-							viklund.handle_response(item)
-							#del item
+							t = threading.Thread(target=viklund.handle_response, args=(item,))
+							t.start()
 			except Exception as e:
-				viklund.Logging.write_log(viklund.Logging.warning(e))
+				exception_message = None
+				if hasattr(e, 'message'):
+					exception_message = e.message()
+				else:
+					exception_message = str(e)
+				print(viklund.Logging.warning(e))
 			time.sleep(1)
 
 	@staticmethod
