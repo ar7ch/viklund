@@ -100,7 +100,7 @@ class Message:
 			except Exception as e:
 				exception_message = None
 				if hasattr(e, 'message'):
-					exception_message = e.message()
+					exception_message = e.message().strip('\'')
 				else:
 					exception_message = str(e)
 				print(viklund.Logging.warning(e))
@@ -151,6 +151,30 @@ class Message:
 			raise
 		return response
 	@staticmethod
+	def parse_text_attachments(item):
+		"""
+		Parse text attachment, such as link attachment type.  
+		
+		Parameters
+		----------
+		item 
+			Item section of response.
+		text : str
+			Text string to append values.
+		Returns
+		-------
+		text_attachment : str
+			Text attachments string.
+		"""
+		text = ''
+		text += item['text']
+		for attachment in item['attachments']:
+			att_type = attachment['type']
+			if att_type == 'link':
+				url = attachment['link']['url']
+				text += '\n{}'.format(url);
+		return text
+	@staticmethod
 	def parse_attachments(item):
 		"""
 		Parse attachments from response item.
@@ -167,12 +191,16 @@ class Message:
 		attachments : list
 			List of attachment strings.
 		"""
+		invalid_attachments = ['page', 'link', 'app', 'poll', 'album', 'photos_list', 'market', 'market_album', 'sticker']
 		attachments = []
 		if 'attachments' in item:
 			for attachment in item['attachments']:
 				#attachment syntax is <type><owner_id>_<media_id>_<access_key>
 				att_string = ''
 				att_type = attachment['type']
+				print(str(attachment))
+				if att_type in invalid_attachments:
+					continue
 				att_owner_id = attachment[att_type]['owner_id']
 				att_media_id = attachment[att_type]['id']
 				att_access_key = ''
