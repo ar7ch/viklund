@@ -49,7 +49,7 @@ def handle_response(item):
 	except Exception as e:
 		exception_message = None
 		if hasattr(e, 'message'):
-			exception_message = e.message()
+			exception_message = e.message().strip('\'')
 		else:
 			exception_message = str(e)
 		print(viklund.Logging.warning(e))
@@ -147,21 +147,18 @@ def handle_post_request(arguments, request, item, post_values = {'owner_id':None
 				viklund.Message.send(message_text = not_found_string)
 				raise KeyError(log_not_found_string)
 			return
-		#TODO: send more than 1 post
+		post_resp = viklund.PostImport.get_post(post_values) # random offset requires calling get_post() to get posts count 				
+		if 'is_pinned' in post_resp['items'][0] and post_resp['items'][0]['is_pinned']:
+			post_values['offset'] += 1
 		if '-random' in arguments:
-			# random offset requires calling get_post() to get posts count
-			post_resp = viklund.PostImport.get_post(post_values)
 			post_count = post_resp['count']
 			post_values['offset'] = random.randint(0, post_count - 1)
-		else:
-			post_values['offset'] = 0
-
 		response = viklund.PostImport.get_post(post_values)
+		if not 'items' in response:
+			viklund.Message.send(message_text = u'Error occured!')
 		post_items = response['items']
 		for post_item in post_items:
-			post_text = ''
-			if post_item['text']:
-				post_text = post_item['text']
+			post_text = viklund.Message.parse_text_attachments(post_item)
 			attachments_list = viklund.Message.parse_attachments(post_item)
 			viklund.Message.send(message_text = post_text, attachments = attachments_list)
 	except Exception as e:
