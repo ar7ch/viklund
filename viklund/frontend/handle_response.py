@@ -140,7 +140,7 @@ def handle_post_request(arguments, request, item, post_values = {'owner_id':None
 		if request in requests:
 			post_values['owner_id'] = requests[request]
 		else:
-			log_not_found_string = 'User request not found: {}'.format(request)
+			log_not_found_string = 'Пользовательский запрос не найден: {}'.format(request)
 			not_found_string = 'Запрос не найден: {}\n/помощь для справки, /пост для доступных импортов\n'.format(request)
 			no_request_string = 'Использование: /пост (-рандом) <запрос>\nДоступные импорты: \n{}'.format('\n'.join(requests.keys()))
 			if not request:
@@ -152,7 +152,7 @@ def handle_post_request(arguments, request, item, post_values = {'owner_id':None
 		post_resp = viklund.PostImport.get_post(post_values) # random offset requires calling get_post() to get posts count 				
 		if 'is_pinned' in post_resp['items'][0] and post_resp['items'][0]['is_pinned']:
 			post_values['offset'] += 1
-		if '-random' in arguments:
+		if '-рандом' in arguments:
 			post_count = post_resp['count']
 			post_values['offset'] = random.randint(0, post_count - 1)
 		response = viklund.PostImport.get_post(post_values)
