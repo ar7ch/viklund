@@ -1,49 +1,52 @@
 # Viklund
 
-Viklund is Python bot (and a little bit of library). Its core functional is based on python273's vk_api library.
+Viklund - это Python бот с легко программируемым поведением (и немного библиотека). Его ключевой функционал основан на библиотеке vk_api от python273.
 
-Viklund can:
-* Send random and latests post from groups and pages using pre-configured .json file (see example.json);
-* Search on Wikipedia;
-* Translate using Google Translate API.
-* Get user info;
-* Show weather (coming soon)
-* Even more, because Viklund was concieved as flexible bot, allowing users to change bot behaviour, abstracting from things like recieving user message and authorization.
+Viklund может:
+* Отправлять случайные и последние записи групп и страниц, используя преконфигурированный .json файл (см. example.json);
+* Искать в Википедии;
+* Переводить, используя Google Translate API;
+* Получать информацию о пользователе;
+* Даже больше, потому что Viklund был задуман как гибкий и модульный бот, позволяющий менять поведение бота, абстрагируясь от вещей вроде получения сообщения и авторизации.
 
-## Table of contents
-* [Requirements](https://github.com/blgkv/viklund#requirements)
-* [Installation](https://github.com/blgkv/viklund#installation)
-* [Setup](https://github.com/blgkv/viklund#setup)
-* [License](https://github.com/blgkv/viklund#license)
-* [Thanks to](https://github.com/blgkv/viklund#thanks-to)
+## Содержание
+* [Требования](https://github.com/blgkv/viklund#требования)
+* [Установка](https://github.com/blgkv/viklund#установка)
+* [Настройка](https://github.com/blgkv/viklund#настройка)
+* [Лицензия](https://github.com/blgkv/viklund#лицензия)
+* [Благодарности](https://github.com/blgkv/viklund#благодарности)
 
-## Requirements
-* Linux (any POSIX-compatible OS might be supported). **Windows is not fully supported**, however, it works with some limitations.
+## Требования
+* Linux (любая POSIX-совместимая ОС должна поддерживаться). **Windows поддерживается не полностью**, тем не менее, работает, но с некоторыми ограничениями.
 * python3
-* vk_api module
-* wikipedia module (optional)
-* googletrans module (optional)
+* модуль vk_api
+* модуль wikipedia (опционально)
+* модуль googletrans (опционально)
 
-## Installation
+## Установка
 
-1. Install vk_api module: 
+1. Установите модуль vk_api: 
 `# pip install vk_api`
-    1.1 (Optional) Install wikipedia module to use bot's Wikipedia search
-    1.2 (Optional) Install googletrans module to use bot's Google Translate translation. 
- 2. Download Viklund: 
+    1.1 (Опционально) Установите модуль wikipedia, чтобы использовать поиск бота по Википедии.
+    1.2 (Опционально) Установите модуль googletrans, чтобы использовать перевод бота с Google Translate. 
+2. Скачайте Viklund: 
 `$ git clone https://github.com/blgkv/viklund.git`
+Если Вы хотите скачать только русифицированную версию:
+`$ git clone --single-branch https://github.com/blgkv/viklund russian`
+	2.1. Переключитесь на ветку russian, если нужно:
+		`$ git checkout russian`
 
-## Setup
-1. Configure import json file (example at example.json)
-2. Edit handle_response.py (if needed)
-3. Launch `main.py` with needed arguments (`$ python main.py --help` for help)
+## Настройка
+1. Настройте конфигурационный json файл импортов (см. example.json)
+2. Модифицируйте под свои нужды handle_response.py (если необходимо)
+3. Запустите `main.py` с необходимыми аргументами (`$ python main.py --help` для справки)
 
-## License
+## Лицензия
 [GPLv3](https://github.com/blgkv/viklund/blob/master/LICENSE)
 
-This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+Это свободная программа: вы можете перераспространять ее и/или изменять ее на условиях Стандартной общественной лицензии GNU в том виде, в каком она была опубликована Фондом свободного программного обеспечения; либо версии 3 лицензии, либо (по вашему выбору) любой более поздней версии.
 
-## Thanks to:
-* github.com/python273, the creator of vk_api module
-* github.com/goldsmith, the creator of wikipedia module
-* github.com/ssut, the creator of googletrans module
+## Благодарности:
+* github.com/python273, создателю модуля vk_api
+* github.com/goldsmith, создателю модуля wikipedia
+* github.com/ssut, создателю модуля googletrans
