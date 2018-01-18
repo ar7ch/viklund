@@ -58,7 +58,9 @@ class System():
 			Viklund will only work until you close the window where you launched it. 
 			Please consider using POSIX-compatible system or WSL (if on Windows)'''
 			viklund.Logging.write_log(viklund.Logging.warning(not_posix_message))
-			
+			if viklund.LOGS_PATH:
+				logs_ignored_message = '''Unable to write logs to file on non-POSIX system, --logs_path argument ignored'''
+				viklund.Logging.write_log(viklund.Logging.warning(logs_ignored_message))
 		viklund.vkApi = viklund.vk_session.get_api()
 		success_message = viklund.Logging.success('Bot started with PID ' + str(os.getpid()))
 		viklund.Logging.write_log(success_message) #output to terminal
