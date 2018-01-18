@@ -58,12 +58,14 @@ class System():
 			Viklund будет работать, пока вы не закроете окно, в котором он запущен. 
 			Пожалуйста, рассмотрите возможность использования POSIX-совместимой ОС или WSL (если на Windows)'''
 			viklund.Logging.write_log(viklund.Logging.warning(not_posix_message))
-
+			
 		viklund.vkApi = viklund.vk_session.get_api()
 		success_message = viklund.Logging.success('Бот запущен с PID ' + str(os.getpid()))
 		viklund.Logging.write_log(success_message) #output to terminal
-		viklund.Logging.override_fd(log_file)
-		viklund.Logging.write_log(success_message) #output to log file
+		if os.name == 'posix':
+			viklund.Logging.override_fd(log_file)
+			viklund.Logging.write_log(success_message) #output to log file
+
 	@staticmethod
 	def handle_args():
 		"""
