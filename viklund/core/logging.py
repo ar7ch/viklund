@@ -26,15 +26,36 @@ import viklund
 from datetime import datetime
 
 class Logging():
-	HEADER = '\033[95m'
-	OKBLUE = '\033[94m'
-	OKGREEN = '\033[92m'
-	WARNING = '\033[93m'
-	FAIL = '\033[91m'
-	ENDC = '\033[0m'
-	BOLD = '\033[1m'
-	UNDERLINE = '\033[4m'
+	def supports_color():
+		"""
+		Return True if the running system's terminal supports color,
+		and False otherwise.
+	
+		Nice ANSI colors support detection from Django https://github.com/django/django/blob/master/django/core/management/color.py
+		"""
+		plat = sys.platform
+		supported_platform = plat != 'Pocket PC' and (plat != 'win32' or 'ANSICON' in os.environ)
+		is_a_tty = hasattr(sys.stdout, 'isatty') and sys.stdout.isatty()
+		return supported_platform and is_a_tty
 
+	if supports_color():
+		HEADER = '\033[95m'
+		OKBLUE = '\033[94m'
+		OKGREEN = '\033[92m'
+		WARNING = '\033[93m'
+		FAIL = '\033[91m'
+		ENDC = '\033[0m'
+		BOLD = '\033[1m'
+		UNDERLINE = '\033[4m'
+	else:
+		HEADER = ''
+		OKBLUE = ''
+		OKGREEN = ''
+		WARNING = ''
+		FAIL = ''
+		ENDC = ''
+		BOLD = ''
+		UNDERLINE = ''
 	@staticmethod
 	def override_fd(log_file):
 		"""
