@@ -39,9 +39,9 @@ def handle_response(item):
 	Setup is done - here goes your bot's response code!
 	There are some essential methods that may be useful.
 	"""
-	request_str = item[u'body'].lower()
+	request_str = item[u'body']
 	sep = request_str.split() 
-	command = sep[0][1:] # remove slash char
+	command = sep[0][1:].lower() # remove slash char
 	arguments = parse_request_args(sep)
 	request = parse_request(sep, arguments)
 	try:
