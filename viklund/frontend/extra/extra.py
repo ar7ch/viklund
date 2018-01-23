@@ -102,14 +102,12 @@ class Extra:
 			viklund.Message.send(message_text=search_result)
 		except wikipedia.PageError:
 			viklund.Message.send(message_text= '{}: not found'.format(search_request))
-			raise
 			return
 		except wikipedia.DisambiguationError as e:
-			viklund.message.send(message_text=e.options)
-			raise
+			viklund.Message.send(message_text=str(e))
 			return
 		except:
 			viklund.Message.send(message_text='An error occurred while searching')
-			raise
+			return
 	def handle_weather_request(request): #coming soon
 		pass
