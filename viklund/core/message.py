@@ -167,12 +167,16 @@ class Message:
 			Text attachments string.
 		"""
 		text = ''
-		text += item['text']
-		for attachment in item['attachments']:
-			att_type = attachment['type']
-			if att_type == 'link':
-				url = attachment['link']['url']
-				text += '\n{}'.format(url);
+		
+		if 'text' in item:
+			text += item['text']
+
+		if 'attachments' in item:
+			for attachment in item['attachments']:
+				att_type = attachment['type']
+				if att_type == 'link':
+					url = attachment['link']['url']
+					text += '\n{}'.format(url);
 		return text
 	@staticmethod
 	def parse_attachments(item):
