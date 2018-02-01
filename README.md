@@ -1,7 +1,7 @@
 # Viklund
 Click [here](https://github.com/blgkv/viklund/tree/russian) for Russian version.
 
-Viklund is Python bot (and a little bit of library). Its core functional is based on python273's vk_api library.
+Viklund is bot for vk.com (and a little bit of library) written in Python. Its core functional is based on python273's vk_api library.
 
 Viklund can:
 * Send random and latests post from groups and pages using pre-configured .json file (see example.json);
