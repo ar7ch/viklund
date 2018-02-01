@@ -1,4 +1,5 @@
 # Viklund
+Click [here](https://github.com/blgkv/viklund/tree/russian) for Russian version.
 
 Viklund is Python bot (and a little bit of library). Its core functional is based on python273's vk_api library.
 
